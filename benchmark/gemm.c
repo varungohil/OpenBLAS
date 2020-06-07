@@ -39,18 +39,38 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef DOUBLE
 #define GEMM   BLASFUNC(dgemm)
+#define FILEA   "dgemm_a.txt"
+#define FILEB   "dgemm_b.txt"
+#define FILEC   "dgemm_c.txt"
+#define FILER   "dgemm_res.txt"
 #elif defined(HALF)
 #define GEMM   BLASFUNC(shgemm)
+#define FILEA   "shgemm_a.txt"
+#define FILEB   "shgemm_b.txt"
+#define FILEC   "shgemm_c.txt"
+#define FILER   "shgemm_res.txt"
 #else
 #define GEMM   BLASFUNC(sgemm)
+#define FILEA   "sgemm_a.txt"
+#define FILEB   "sgemm_b.txt"
+#define FILEC   "sgemm_c.txt"
+#define FILER   "sgemm_res.txt"
 #endif
 
 #else
 
 #ifdef DOUBLE
 #define GEMM   BLASFUNC(zgemm)
+#define FILEA   "zgemm_a.txt"
+#define FILEB   "zgemm_b.txt"
+#define FILEC   "zgemm_c.txt"
+#define FILER   "zgemm_res.txt"
 #else
 #define GEMM   BLASFUNC(cgemm)
+#define FILEA   "cgemm_a.txt"
+#define FILEB   "cgemm_b.txt"
+#define FILEC   "cgemm_c.txt"
+#define FILER   "cgemm_res.txt"
 #endif
 
 #endif
@@ -200,16 +220,25 @@ int main(int argc, char *argv[]){
 #ifdef linux
   srandom(getpid());
 #endif
-
+  FILE *fp;
+  fp = fopen(FILEA,"w");
   for (i = 0; i < m * k * COMPSIZE; i++) {
     a[i] = ((IFLOAT) rand() / (IFLOAT) RAND_MAX) - 0.5;
+    fprintf(fp, "%d\n", a[i]);
   }
+  fclose(fp);
+  fp = fopen(FILEB,"w");
   for (i = 0; i < k * n * COMPSIZE; i++) {
     b[i] = ((IFLOAT) rand() / (IFLOAT) RAND_MAX) - 0.5;
+    fprintf(fp, "%d\n", b[i]);
   }
+  fclose(fp);
+  fp = fopen(FILEC,"w");
   for (i = 0; i < m * n * COMPSIZE; i++) {
     c[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+    fprintf(fp, "%d\n", c[i]);
   }
+  fclose(fp);
 
   fprintf(stderr, "          SIZE                   Flops             Time\n");
 
@@ -232,6 +261,13 @@ int main(int argc, char *argv[]){
 
     for (j=0; j<loops; j++) {
       GEMM (&transa, &transb, &m, &n, &k, alpha, a, &lda, b, &ldb, beta, c, &ldc);
+      fp = fopen(FILER,"w");
+      for (i = 0; i < m * n * COMPSIZE; i++) 
+      {
+	 fprintf(fp, "%d\n", c[i]);
+      }
+      fclose(fp);
+	    
     }
 
     gettimeofday( &stop, (struct timezone *)0);
