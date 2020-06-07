@@ -224,19 +224,19 @@ int main(int argc, char *argv[]){
   fp = fopen(FILEA,"w");
   for (i = 0; i < m * k * COMPSIZE; i++) {
     a[i] = ((IFLOAT) rand() / (IFLOAT) RAND_MAX) - 0.5;
-    fprintf(fp, "%d\n", a[i]);
+    fprintf(fp, "%f\n", a[i]);
   }
   fclose(fp);
   fp = fopen(FILEB,"w");
   for (i = 0; i < k * n * COMPSIZE; i++) {
     b[i] = ((IFLOAT) rand() / (IFLOAT) RAND_MAX) - 0.5;
-    fprintf(fp, "%d\n", b[i]);
+    fprintf(fp, "%f\n", b[i]);
   }
   fclose(fp);
   fp = fopen(FILEC,"w");
   for (i = 0; i < m * n * COMPSIZE; i++) {
     c[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-    fprintf(fp, "%d\n", c[i]);
+    fprintf(fp, "%f\n", c[i]);
   }
   fclose(fp);
 
@@ -264,7 +264,7 @@ int main(int argc, char *argv[]){
       fp = fopen(FILER,"w");
       for (i = 0; i < m * n * COMPSIZE; i++) 
       {
-	 fprintf(fp, "%d\n", c[i]);
+	 fprintf(fp, "%f\n", c[i]);
       }
       fclose(fp);
 	    
