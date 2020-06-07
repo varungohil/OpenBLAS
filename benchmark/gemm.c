@@ -246,6 +246,7 @@ int main(int argc, char *argv[]){
 	  fp = fopen(FILEA,"r");
 	  for (i = 0; i < m * k * COMPSIZE; i++) {
 	    fscanf(fp, "%f\n", &a[i]);
+	    printf("%f", a[i])
 	  }
 	  fclose(fp);
 	  fp = fopen(FILEB,"r");
