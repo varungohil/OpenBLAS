@@ -158,12 +158,13 @@ int main(int argc, char *argv[]){
   int from =   1;
   int to   = 200;
   int step =   1;
+  int random_input = 0; //Varun added
 
   struct timeval start, stop;
   double time1, timeg;
 
   argc--;argv++;
-
+  if (argc > 0) { random_input = atol(*argv);    argc--; argv++; }
   if (argc > 0) { from = atol(*argv);            argc--; argv++; }
   if (argc > 0) { to   = MAX(atol(*argv), from); argc--; argv++; }
   if (argc > 0) { step = atol(*argv);            argc--; argv++; }
@@ -221,24 +222,43 @@ int main(int argc, char *argv[]){
   srandom(getpid());
 #endif
   FILE *fp;
-  fp = fopen(FILEA,"w");
-  for (i = 0; i < m * k * COMPSIZE; i++) {
-    a[i] = ((IFLOAT) rand() / (IFLOAT) RAND_MAX) - 0.5;
-    fprintf(fp, "%f\n", a[i]);
+  if(random_input){
+	  fp = fopen(FILEA,"w");
+	  for (i = 0; i < m * k * COMPSIZE; i++) {
+	    a[i] = ((IFLOAT) rand() / (IFLOAT) RAND_MAX) - 0.5;
+	    fprintf(fp, "%f\n", a[i]);
+	  }
+	  fclose(fp);
+	  fp = fopen(FILEB,"w");
+	  for (i = 0; i < k * n * COMPSIZE; i++) {
+	    b[i] = ((IFLOAT) rand() / (IFLOAT) RAND_MAX) - 0.5;
+	    fprintf(fp, "%f\n", b[i]);
+	  }
+	  fclose(fp);
+	  fp = fopen(FILEC,"w");
+	  for (i = 0; i < m * n * COMPSIZE; i++) {
+	    c[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+	    fprintf(fp, "%f\n", c[i]);
+	  }
+	  fclose(fp);
   }
-  fclose(fp);
-  fp = fopen(FILEB,"w");
-  for (i = 0; i < k * n * COMPSIZE; i++) {
-    b[i] = ((IFLOAT) rand() / (IFLOAT) RAND_MAX) - 0.5;
-    fprintf(fp, "%f\n", b[i]);
+  else{
+	  fp = fopen(FILEA,"w");
+	  for (i = 0; i < m * k * COMPSIZE; i++) {
+	    fscanf(fp, "%f\n", &a[i]);
+	  }
+	  fclose(fp);
+	  fp = fopen(FILEB,"w");
+	  for (i = 0; i < k * n * COMPSIZE; i++) {
+	    fscanf(fp, "%f\n", &b[i]);
+	  }
+	  fclose(fp);
+	  fp = fopen(FILEC,"w");
+	  for (i = 0; i < m * n * COMPSIZE; i++) {
+	     fscanf(fp, "%f\n", &c[i]);
+	  }
+	  fclose(fp);
   }
-  fclose(fp);
-  fp = fopen(FILEC,"w");
-  for (i = 0; i < m * n * COMPSIZE; i++) {
-    c[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-    fprintf(fp, "%f\n", c[i]);
-  }
-  fclose(fp);
 
   fprintf(stderr, "          SIZE                   Flops             Time\n");
 
