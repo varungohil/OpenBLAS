@@ -282,9 +282,9 @@ int main(int argc, char *argv[]){
     for (j=0; j<loops; j++) {
       GEMM (&transa, &transb, &m, &n, &k, alpha, a, &lda, b, &ldb, beta, c, &ldc);
       fp = fopen(FILER,"w");
-      for (i = 0; i < m * n * COMPSIZE; i++) 
+      for (k = 0; k < m * n * COMPSIZE; k++) 
       {
-	 fprintf(fp, "%f\n", c[i]);
+	 fprintf(fp, "%f\n", c[k]);
       }
       fclose(fp);
 	    
