@@ -243,17 +243,17 @@ int main(int argc, char *argv[]){
 	  fclose(fp);
   }
   else{
-	  fp = fopen(FILEA,"w");
+	  fp = fopen(FILEA,"r");
 	  for (i = 0; i < m * k * COMPSIZE; i++) {
 	    fscanf(fp, "%f\n", &a[i]);
 	  }
 	  fclose(fp);
-	  fp = fopen(FILEB,"w");
+	  fp = fopen(FILEB,"r");
 	  for (i = 0; i < k * n * COMPSIZE; i++) {
 	    fscanf(fp, "%f\n", &b[i]);
 	  }
 	  fclose(fp);
-	  fp = fopen(FILEC,"w");
+	  fp = fopen(FILEC,"r");
 	  for (i = 0; i < m * n * COMPSIZE; i++) {
 	     fscanf(fp, "%f\n", &c[i]);
 	  }
