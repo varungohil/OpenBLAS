@@ -43,18 +43,21 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FILEB   "dgemm_b.txt"
 #define FILEC   "dgemm_c.txt"
 #define FILER   "dgemm_res.txt"
+#define FORMAT  "%lf\n"
 #elif defined(HALF)
 #define GEMM   BLASFUNC(shgemm)
 #define FILEA   "shgemm_a.txt"
 #define FILEB   "shgemm_b.txt"
 #define FILEC   "shgemm_c.txt"
 #define FILER   "shgemm_res.txt"
+#define FORMAT  "%f\n"
 #else
 #define GEMM   BLASFUNC(sgemm)
 #define FILEA   "sgemm_a.txt"
 #define FILEB   "sgemm_b.txt"
 #define FILEC   "sgemm_c.txt"
 #define FILER   "sgemm_res.txt"
+#define FORMAT  "%f\n"
 #endif
 
 #else
@@ -65,12 +68,14 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FILEB   "zgemm_b.txt"
 #define FILEC   "zgemm_c.txt"
 #define FILER   "zgemm_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define GEMM   BLASFUNC(cgemm)
 #define FILEA   "cgemm_a.txt"
 #define FILEB   "cgemm_b.txt"
 #define FILEC   "cgemm_c.txt"
 #define FILER   "cgemm_res.txt"
+#define FORMAT  "%f\n"
 #endif
 
 #endif
@@ -227,19 +232,19 @@ int main(int argc, char *argv[]){
 	  fp = fopen(FILEA,"w");
 	  for (i = 0; i < m * k * COMPSIZE; i++) {
 	    a[i] = ((IFLOAT) rand() / (IFLOAT) RAND_MAX) - 0.5;
-	    fprintf(fp, "%lf\n", a[i]);
+	    fprintf(fp, FORMAT, a[i]);
 	  }
 	  fclose(fp);
 	  fp = fopen(FILEB,"w");
 	  for (i = 0; i < k * n * COMPSIZE; i++) {
 	    b[i] = ((IFLOAT) rand() / (IFLOAT) RAND_MAX) - 0.5;
-	    fprintf(fp, "%lf\n", b[i]);
+	    fprintf(fp, FORMAT, b[i]);
 	  }
 	  fclose(fp);
 	  fp = fopen(FILEC,"w");
 	  for (i = 0; i < m * n * COMPSIZE; i++) {
 	    c[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-	    fprintf(fp, "%lf\n", c[i]);
+	    fprintf(fp, FORMAT, c[i]);
 	  }
 	  fclose(fp);
   }
@@ -247,8 +252,8 @@ int main(int argc, char *argv[]){
 	  fp = fopen(FILEA,"r");
 	  fp2 = fopen("new_a.txt","w");
 	  for (i = 0; i < m * k * COMPSIZE; i++) {
-	    fscanf(fp, "%lf\n", &a[i]);
-            fprintf(fp2, "%lf\n", a[i]);
+	    fscanf(fp, FORMAT, &a[i]);
+            fprintf(fp2, "FORMAT, a[i]);
 // 	    printf("%f", a[i]);
 	  }
 	  fclose(fp2);
@@ -256,16 +261,16 @@ int main(int argc, char *argv[]){
 	  fp = fopen(FILEB,"r");
 	  fp2 = fopen("new_b.txt","w");
 	  for (i = 0; i < k * n * COMPSIZE; i++) {
-	    fscanf(fp, "%lf\n", &b[i]);
-	    fprintf(fp2, "%lf\n", b[i]);
+	    fscanf(fp, FORMAT, &b[i]);
+	    fprintf(fp2, FORMAT, b[i]);
 	  }
 	  fclose(fp2);
 	  fclose(fp);
 	  fp = fopen(FILEC,"r");
 	  fp2 = fopen("new_c.txt","w");
 	  for (i = 0; i < m * n * COMPSIZE; i++) {
-	     fscanf(fp, "%lf\n", &c[i]);
-	     fprintf(fp2, "%lf\n", c[i]);
+	     fscanf(fp, FORMAT, &c[i]);
+	     fprintf(fp2, FORMAT, c[i]);
 	  }
 	  fclose(fp2);
 	  fclose(fp);
@@ -293,9 +298,9 @@ int main(int argc, char *argv[]){
     for (j=0; j<loops; j++) {
       GEMM (&transa, &transb, &m, &n, &k, alpha, a, &lda, b, &ldb, beta, c, &ldc);
       fp = fopen(FILER,"w");
-      for (k = 0; k < m * n * COMPSIZE; k++) 
+      for (x = 0; x < m * n * COMPSIZE; x++) 
       {
-	 fprintf(fp, "%lf\n", c[k]);
+	 fprintf(fp, FORMAT, c[x]);
       }
       fclose(fp);
 	    
