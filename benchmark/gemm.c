@@ -244,20 +244,29 @@ int main(int argc, char *argv[]){
   }
   else{
 	  fp = fopen(FILEA,"r");
+	  fp2 = fopen("new_a.txt","w");
 	  for (i = 0; i < m * k * COMPSIZE; i++) {
 	    fscanf(fp, "%f\n", &a[i]);
+            fprintf(fp, "%f\n", a[i]);
 // 	    printf("%f", a[i]);
 	  }
+	  fclose(fp2)
 	  fclose(fp);
 	  fp = fopen(FILEB,"r");
+	  fp2 = fopen("new_b.txt","w");
 	  for (i = 0; i < k * n * COMPSIZE; i++) {
 	    fscanf(fp, "%f\n", &b[i]);
+	    fprintf(fp, "%f\n", b[i]);
 	  }
+	  fclose(fp2)
 	  fclose(fp);
 	  fp = fopen(FILEC,"r");
+	  fp2 = fopen("new_c.txt","w");
 	  for (i = 0; i < m * n * COMPSIZE; i++) {
 	     fscanf(fp, "%f\n", &c[i]);
+	     fprintf(fp, "%f\n", c[i]);
 	  }
+	  fclose(fp2)
 	  fclose(fp);
   }
 
