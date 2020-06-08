@@ -252,7 +252,7 @@ int main(int argc, char *argv[]){
 	  fp = fopen(FILEA,"r");
 	  fp2 = fopen("new_a.txt","w");
 	  for (i = 0; i < m * k * COMPSIZE; i++) {
-	    fscanf(fp, FORMAT, &a[i]);
+	    fscanf(fp, "%f\n", &a[i]);
             fprintf(fp2, FORMAT, a[i]);
 // 	    printf("%f", a[i]);
 	  }
@@ -261,7 +261,7 @@ int main(int argc, char *argv[]){
 	  fp = fopen(FILEB,"r");
 	  fp2 = fopen("new_b.txt","w");
 	  for (i = 0; i < k * n * COMPSIZE; i++) {
-	    fscanf(fp, FORMAT, &b[i]);
+	    fscanf(fp, "%f\n", &b[i]);
 	    fprintf(fp2, FORMAT, b[i]);
 	  }
 	  fclose(fp2);
@@ -269,7 +269,7 @@ int main(int argc, char *argv[]){
 	  fp = fopen(FILEC,"r");
 	  fp2 = fopen("new_c.txt","w");
 	  for (i = 0; i < m * n * COMPSIZE; i++) {
-	     fscanf(fp, FORMAT, &c[i]);
+	     fscanf(fp, "%f\n", &c[i]);
 	     fprintf(fp2, FORMAT, c[i]);
 	  }
 	  fclose(fp2);
