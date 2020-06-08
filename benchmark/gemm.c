@@ -50,14 +50,14 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FILEB   "shgemm_b.txt"
 #define FILEC   "shgemm_c.txt"
 #define FILER   "shgemm_res.txt"
-#define FORMAT  "%0.7f\n"
+#define FORMAT  "%.7f\n"
 #else
 #define GEMM   BLASFUNC(sgemm)
 #define FILEA   "sgemm_a.txt"
 #define FILEB   "sgemm_b.txt"
 #define FILEC   "sgemm_c.txt"
 #define FILER   "sgemm_res.txt"
-#define FORMAT  "%0.7f\n"
+#define FORMAT  "%.7f\n"
 #endif
 
 #else
@@ -75,7 +75,7 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FILEB   "cgemm_b.txt"
 #define FILEC   "cgemm_c.txt"
 #define FILER   "cgemm_res.txt"
-#define FORMAT  "%0.7f\n"
+#define FORMAT  "%.7f\n"
 #endif
 
 #endif
