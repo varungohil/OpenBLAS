@@ -253,7 +253,7 @@ int main(int argc, char *argv[]){
 	  fp2 = fopen("new_a.txt","w");
 	  for (i = 0; i < m * k * COMPSIZE; i++) {
 	    fscanf(fp, FORMAT, &a[i]);
-            fprintf(fp2, "FORMAT, a[i]);
+            fprintf(fp2, FORMAT, a[i]);
 // 	    printf("%f", a[i]);
 	  }
 	  fclose(fp2);
@@ -298,7 +298,7 @@ int main(int argc, char *argv[]){
     for (j=0; j<loops; j++) {
       GEMM (&transa, &transb, &m, &n, &k, alpha, a, &lda, b, &ldb, beta, c, &ldc);
       fp = fopen(FILER,"w");
-      for (x = 0; x < m * n * COMPSIZE; x++) 
+      for (int x = 0; x < m * n * COMPSIZE; x++) 
       {
 	 fprintf(fp, FORMAT, c[x]);
       }
