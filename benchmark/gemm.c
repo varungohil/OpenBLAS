@@ -227,19 +227,19 @@ int main(int argc, char *argv[]){
 	  fp = fopen(FILEA,"w");
 	  for (i = 0; i < m * k * COMPSIZE; i++) {
 	    a[i] = ((IFLOAT) rand() / (IFLOAT) RAND_MAX) - 0.5;
-	    fprintf(fp, "%f\n", a[i]);
+	    fprintf(fp, "%lf\n", a[i]);
 	  }
 	  fclose(fp);
 	  fp = fopen(FILEB,"w");
 	  for (i = 0; i < k * n * COMPSIZE; i++) {
 	    b[i] = ((IFLOAT) rand() / (IFLOAT) RAND_MAX) - 0.5;
-	    fprintf(fp, "%f\n", b[i]);
+	    fprintf(fp, "%lf\n", b[i]);
 	  }
 	  fclose(fp);
 	  fp = fopen(FILEC,"w");
 	  for (i = 0; i < m * n * COMPSIZE; i++) {
 	    c[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-	    fprintf(fp, "%f\n", c[i]);
+	    fprintf(fp, "%lf\n", c[i]);
 	  }
 	  fclose(fp);
   }
@@ -247,8 +247,8 @@ int main(int argc, char *argv[]){
 	  fp = fopen(FILEA,"r");
 	  fp2 = fopen("new_a.txt","w");
 	  for (i = 0; i < m * k * COMPSIZE; i++) {
-	    fscanf(fp, "%f\n", &a[i]);
-            fprintf(fp2, "%f\n", a[i]);
+	    fscanf(fp, "%lf\n", &a[i]);
+            fprintf(fp2, "%lf\n", a[i]);
 // 	    printf("%f", a[i]);
 	  }
 	  fclose(fp2);
@@ -256,16 +256,16 @@ int main(int argc, char *argv[]){
 	  fp = fopen(FILEB,"r");
 	  fp2 = fopen("new_b.txt","w");
 	  for (i = 0; i < k * n * COMPSIZE; i++) {
-	    fscanf(fp, "%f\n", &b[i]);
-	    fprintf(fp2, "%f\n", b[i]);
+	    fscanf(fp, "%lf\n", &b[i]);
+	    fprintf(fp2, "%lf\n", b[i]);
 	  }
 	  fclose(fp2);
 	  fclose(fp);
 	  fp = fopen(FILEC,"r");
 	  fp2 = fopen("new_c.txt","w");
 	  for (i = 0; i < m * n * COMPSIZE; i++) {
-	     fscanf(fp, "%f\n", &c[i]);
-	     fprintf(fp2, "%f\n", c[i]);
+	     fscanf(fp, "%lf\n", &c[i]);
+	     fprintf(fp2, "%lf\n", c[i]);
 	  }
 	  fclose(fp2);
 	  fclose(fp);
@@ -295,7 +295,7 @@ int main(int argc, char *argv[]){
       fp = fopen(FILER,"w");
       for (k = 0; k < m * n * COMPSIZE; k++) 
       {
-	 fprintf(fp, "%f\n", c[k]);
+	 fprintf(fp, "%lf\n", c[k]);
       }
       fclose(fp);
 	    
