@@ -37,8 +37,18 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef DOUBLE
 #define SPR2   BLASFUNC(dspr2)
+#define FILEA   "dspr_a.txt"
+#define FILEB   "dspr_b.txt"
+#define FILEC   "dspr_c.txt"
+#define FILER   "dspr_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define SPR2   BLASFUNC(sspr2)
+#define FILEA   "sspr_a.txt"
+#define FILEB   "sspr_b.txt"
+#define FILEC   "sspr_c.txt"
+#define FILER   "sspr_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 
 
@@ -128,12 +138,13 @@ int main(int argc, char *argv[]){
   int from =   1;
   int to   = 200;
   int step =   1;
+  int random_input = 0; //Varun added
 
   struct timeval start, stop;
   double time1,timeg;
 
   argc--;argv++;
-
+  if (argc > 0) { random_input = atol(*argv);    argc--; argv++; }
   if (argc > 0) { from     = atol(*argv);		argc--; argv++;}
   if (argc > 0) { to       = MAX(atol(*argv), from);	argc--; argv++;}
   if (argc > 0) { step     = atol(*argv);		argc--; argv++;}
@@ -158,39 +169,92 @@ int main(int argc, char *argv[]){
 #endif
 
   fprintf(stderr, "   SIZE       Flops		Time\n");
-
+  FILE *fp;
   for(m = from; m <= to; m += step)
   {
     timeg=0;
 	
     fprintf(stderr, " %6d : ", (int)m);
 	
-	for (l=0; l<loops; l++)
+    for (l=0; l<loops; l++)
     {
-
+	    if(random_input)
+	    {
+		fp = fopen(FILEA,"w");
 		for(j = 0; j < m; j++){
 		  for(i = 0; i < m * COMPSIZE; i++){
 			a[(long)i + (long)j * (long)m * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+			 fprintf(fp, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
 		  }
 		}
-		
+		fclose(fp);
+		fp = fopen(FILEB,"w");
 		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
 			b[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+			fprintf(fp, FORMAT, b[i]);
 		}
-		
+		fclose(fp);
+		fp = fopen(FILEC,"w");
 		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
 			c[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+			fprintf(fp, FORMAT, b[i]);
 		}
+		fclose(fp);
 
 		gettimeofday( &start, (struct timezone *)0);
 
 		SPR2 (&uplo, &m, alpha, c, &inc_x, b, &inc_y, a);
 
 		gettimeofday( &stop, (struct timezone *)0);
-
+		    
+		fp = fopen(FILER,"w");   
+		for(j = 0; j < m; j++){
+		  for(i = 0; i < m * COMPSIZE; i++){
+			 fprintf(fp, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
+		  }
+		}
+		    
 		time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
 		
 		timeg += time1;
+	    }
+	    else
+	    {
+		fp = fopen(FILEA,"r");
+		for(j = 0; j < m; j++){
+		  for(i = 0; i < m * COMPSIZE; i++){
+			 fscanf(fp, "%f\n", &a[(long)i + (long)j * (long)m * COMPSIZE]);
+		  }
+		}
+		fclose(fp);
+		fp = fopen(FILEB,"r");
+		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
+			fscanf(fp, "%f\n", &b[i]);
+		}
+		fclose(fp);
+		fp = fopen(FILEC,"w");
+		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
+			fscanf(fp, "%f\n", &c[i]);
+		}
+		fclose(fp);
+
+		gettimeofday( &start, (struct timezone *)0);
+
+		SPR2 (&uplo, &m, alpha, c, &inc_x, b, &inc_y, a);
+
+		gettimeofday( &stop, (struct timezone *)0);
+		    
+		fp = fopen(FILER,"w");   
+		for(j = 0; j < m; j++){
+		  for(i = 0; i < m * COMPSIZE; i++){
+			 fprintf(fp, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
+		  }
+		}
+		    
+		time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
+		
+		timeg += time1;
+	    }
    }
 	
     timeg /= loops;
