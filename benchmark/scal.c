@@ -38,14 +38,26 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef COMPLEX
 #ifdef DOUBLE
 #define SCAL   BLASFUNC(zscal)
+#define FILEX   "dzscal_x.txt"
+#define FILER   "dzscal_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define SCAL   BLASFUNC(cscal)
+#define FILEX   "cscal_x.txt"
+#define FILER   "cscal_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 #else
 #ifdef DOUBLE
 #define SCAL   BLASFUNC(dscal)
+#define FILEX   "dscal_x.txt"
+#define FILER   "dscal_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define SCAL   BLASFUNC(sscal)
+#define FILEX   "sscal_x.txt"
+#define FILER   "sscal_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 #endif
 
@@ -127,12 +139,13 @@ int main(int argc, char *argv[]){
   int from =   1;
   int to   = 200;
   int step =   1;
+  int random_input = 0;
 
   struct timeval start, stop;
   double time1,timeg;
 
   argc--;argv++;
-
+  if (argc > 0) { random_input = atol(*argv);    argc--; argv++; }
   if (argc > 0) { from     = atol(*argv);		argc--; argv++;}
   if (argc > 0) { to       = MAX(atol(*argv), from);	argc--; argv++;}
   if (argc > 0) { step     = atol(*argv);		argc--; argv++;}
@@ -163,28 +176,66 @@ int main(int argc, char *argv[]){
 
    fprintf(stderr, " %6d : ", (int)m);
 
-
-   for (l=0; l<loops; l++)
+   if(random_input)
    {
+	   for (l=0; l<loops; l++)
+	   {
+                fp = fopen(FILEX,"w");
+		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
+				x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+			        fprintf(fp, FORMAT, x[i]);
+		}
+		fclose(fp);
 
-   	for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
-			x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-   	}
+		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
+				y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+		}
+		gettimeofday( &start, (struct timezone *)0);
 
-   	for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
-			y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-   	}
-    	gettimeofday( &start, (struct timezone *)0);
+		SCAL (&m, alpha, x, &inc_x);
 
-    	SCAL (&m, alpha, x, &inc_x);
+		gettimeofday( &stop, (struct timezone *)0);
+                fp = fopen(FILER,"w");
+		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
+			        fprintf(fp, FORMAT, x[i]);
+		}
+		fclose(fp);
+		time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
 
-    	gettimeofday( &stop, (struct timezone *)0);
+		timeg += time1;
 
-    	time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
+	    }
+   }
+   else
+   {
+	   for (l=0; l<loops; l++)
+	   {
+                fp = fopen(FILEX,"r");
+		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
+			fscanf(fp, "%f\n", &x[i]);
+		}
+		fclose(fp);
 
-	timeg += time1;
+		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
+				y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+		}
+		gettimeofday( &start, (struct timezone *)0);
 
-    }
+		SCAL (&m, alpha, x, &inc_x);
+
+		gettimeofday( &stop, (struct timezone *)0);
+                fp = fopen(FILER,"w");
+		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
+			        fprintf(fp, FORMAT, x[i]);
+		}
+		fclose(fp);
+		time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
+
+		timeg += time1;
+
+	    }
+   }
+
 
     timeg /= loops;
 
