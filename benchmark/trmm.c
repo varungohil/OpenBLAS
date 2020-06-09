@@ -39,16 +39,32 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef DOUBLE
 #define TRMM   BLASFUNC(dtrmm)
+#define FILEA   "dtrmm_a.txt"
+#define FILEB   "dtrmm_b.txt"
+#define FILER   "dtrmm_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define TRMM   BLASFUNC(strmm)
+#define FILEA   "strmm_a.txt"
+#define FILEB   "strmm_b.txt"
+#define FILER   "strmm_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 
 #else
 
 #ifdef DOUBLE
 #define TRMM   BLASFUNC(ztrmm)
+#define FILEA   "ztrmm_a.txt"
+#define FILEB   "ztrmm_b.txt"
+#define FILER   "ztrmm_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define TRMM   BLASFUNC(ctrmm)
+#define FILEA   "ctrmm_a.txt"
+#define FILEB   "ctrmm_b.txt"
+#define FILER   "ctrmm_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 
 #endif
@@ -140,12 +156,13 @@ int main(int argc, char *argv[]){
   int from =   1;
   int to   = 200;
   int step =   1;
+  int random_input = 0; //Varun added
 
   struct timeval start, stop;
   double time1;
 
   argc--;argv++;
-
+  if (argc > 0) { random_input = atol(*argv);    argc--; argv++; }
   if (argc > 0) { from     = atol(*argv);		argc--; argv++;}
   if (argc > 0) { to       = MAX(atol(*argv), from);	argc--; argv++;}
   if (argc > 0) { step     = atol(*argv);		argc--; argv++;}
@@ -167,24 +184,65 @@ int main(int argc, char *argv[]){
 #endif
 
   fprintf(stderr, "   SIZE       Flops\n");
-
+  FILE *fpa;
+  FILE *fpb;
   for(m = from; m <= to; m += step)
   {
 
     fprintf(stderr, " %6d : ", (int)m);
+    if(random_input)
+    {
+	    fpa = fopen(FILEA,"w");
+	    fpb = fopen(FILEB,"w");
+	    for(j = 0; j < m; j++){
+	      for(i = 0; i < m * COMPSIZE; i++){
+		a[(long)i + (long)j * (long)m * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+		b[(long)i + (long)j * (long)m * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+		fprintf(fpa, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
+		fprintf(fpb, FORMAT, b[(long)i + (long)j * (long)m * COMPSIZE]);
+               }
+             }
+	    fclose(fpa);
+	    fclose(fpb);
+	    gettimeofday( &start, (struct timezone *)0);
 
-    for(j = 0; j < m; j++){
-      for(i = 0; i < m * COMPSIZE; i++){
-	a[(long)i + (long)j * (long)m * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-	b[(long)i + (long)j * (long)m * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-      }
+	    TRMM (&side, &uplo, &trans, &diag, &m, &m, alpha, a, &m, b, &m);
+
+	    gettimeofday( &stop, (struct timezone *)0);
+	    fpb = fopen(FILER,"w");
+	    for(j = 0; j < m; j++){
+	      for(i = 0; i < m * COMPSIZE; i++){
+		fprintf(fpb, FORMAT, b[(long)i + (long)j * (long)m * COMPSIZE]);
+               }
+             }
+	    fclose(fpb);
+    }
+    else
+    {
+	    fpa = fopen(FILEA,"w");
+	    fpb = fopen(FILEB,"w");
+	    for(j = 0; j < m; j++){
+	      for(i = 0; i < m * COMPSIZE; i++){
+		fscanf(fpa, "%f\n", &a[(long)i + (long)j * (long)m * COMPSIZE]);
+		fscanf(fpb, "%f\n", &b[(long)i + (long)j * (long)m * COMPSIZE]);
+               }
+             }
+	    fclose(fpa);
+	    fclose(fpb);
+	    gettimeofday( &start, (struct timezone *)0);
+
+	    TRMM (&side, &uplo, &trans, &diag, &m, &m, alpha, a, &m, b, &m);
+
+	    gettimeofday( &stop, (struct timezone *)0);
+	    fpb = fopen(FILER,"w");
+	    for(j = 0; j < m; j++){
+	      for(i = 0; i < m * COMPSIZE; i++){
+		fprintf(fpb, FORMAT, b[(long)i + (long)j * (long)m * COMPSIZE]);
+               }
+             }
+	    fclose(fpb);
     }
 
-    gettimeofday( &start, (struct timezone *)0);
-
-    TRMM (&side, &uplo, &trans, &diag, &m, &m, alpha, a, &m, b, &m);
-
-    gettimeofday( &stop, (struct timezone *)0);
 
     time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
 
