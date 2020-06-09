@@ -189,7 +189,7 @@ int main(int argc, char *argv[]){
 		result = NRM2 (&m, x, &inc_x);
 
 		gettimeofday( &stop, (struct timezone *)0);
-                fp = fopen(FILEX,"w");
+                fp = fopen(FILER,"w");
 		fprintf(fp, FORMAT, result);
 		fclose(fp);
 		
@@ -210,7 +210,7 @@ int main(int argc, char *argv[]){
 		result = NRM2 (&m, x, &inc_x);
 
 		gettimeofday( &stop, (struct timezone *)0);
-                fp = fopen(FILEX,"w");
+                fp = fopen(FILER,"w");
 		fprintf(fp, FORMAT, result);
 		fclose(fp);
 		
