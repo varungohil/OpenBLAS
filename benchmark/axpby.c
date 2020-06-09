@@ -38,14 +38,30 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef COMPLEX
 #ifdef DOUBLE
 #define AXPBY   BLASFUNC(zaxpby)
+#define FILEX   "zaxpby_x.txt"
+#define FILEY   "zaxpby_y.txt"
+#define FILER   "zaxpby_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define AXPBY   BLASFUNC(caxpby)
+#define FILEX   "caxpby_x.txt"
+#define FILEY   "caxpby_y.txt"
+#define FILER   "caxpby_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 #else
 #ifdef DOUBLE
 #define AXPBY   BLASFUNC(daxpby)
+#define FILEX   "daxpby_x.txt"
+#define FILEY   "daxpby_y.txt"
+#define FILER   "daxpby_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define AXPBY   BLASFUNC(saxpby)
+#define FILEX   "saxpby_x.txt"
+#define FILEY   "saxpby_y.txt"
+#define FILER   "saxpby_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 #endif
 
