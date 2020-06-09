@@ -38,16 +38,32 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef DOUBLE
 #define TPMV   BLASFUNC(dtpmv)
+#define FILEA   "dtpmv_a.txt"
+#define FILEX   "dtpmv_x.txt"
+#define FILER   "dtpmv_res.txt"
+#define FORMAT  "%.14f\n"
 #else
 #define TPMV   BLASFUNC(stpmv)
+#define FILEA   "stpmv_a.txt"
+#define FILEX   "stpmv_x.txt"
+#define FILER   "stpmv_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 
 #else
 
 #ifdef DOUBLE
 #define TPMV   BLASFUNC(ztpmv)
+#define FILEA   "ztpmv_a.txt"
+#define FILEX   "ztpmv_x.txt"
+#define FILER   "ztpmv_res.txt"
+#define FORMAT  "%.14f\n"
 #else
 #define TPMV   BLASFUNC(ctpmv)
+#define FILEA   "ctpmv_a.txt"
+#define FILEX   "ctpmv_x.txt"
+#define FILER   "ctpmv_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 
 #endif
@@ -111,12 +127,13 @@ int main(int argc, char *argv[])
     int from =   1;
     int to   = 200;
     int step =   1;
+    int random_input = 0; //Varun added
 
     struct timespec start = { 0, 0 }, stop = { 0, 0 };
     double time1, timeg;
 
     argc--;argv++;
-
+    if (argc > 0) { random_input = atol(*argv);    argc--; argv++; }
     if (argc > 0) { from     = atol(*argv);        argc--; argv++;}
     if (argc > 0) { to       = MAX(atol(*argv), from);    argc--; argv++;}
     if (argc > 0) { step     = atol(*argv);        argc--; argv++;}
@@ -137,30 +154,73 @@ int main(int argc, char *argv[])
 #endif
 
     fprintf(stderr, "   SIZE       Flops\n");
-
+    FILE *fp; //Varun added
     for(n = from; n <= to; n += step) {
         timeg=0;
-
         fprintf(stderr, " %6d : ", (int)n);
-        for(j = 0; j < n; j++) {
-            for(i = 0; i < n * COMPSIZE; i++) {
-                a[(long)i + (long)j * (long)n * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+        if(random_input)
+        {
+            fp = fopen(FILEA,"w");
+            for(j = 0; j < n; j++) {
+                for(i = 0; i < n * COMPSIZE; i++) {
+                    a[(long)i + (long)j * (long)n * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+                    fprintf(fp, FORMAT, a[(long)j + (long)i * (long)m * COMPSIZE]);
+                }
+            }
+            fclose(fp);
+            
+            fp = fopen(FILEX,"w");
+            for (i = 0; i < n * COMPSIZE * abs(inc_x); i++) {
+                x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+                fprintf(fp, FORMAT, x[i]);
+            }
+            fclose(fp);
+
+            for (l = 0; l < loops; l++) {
+                clock_gettime(CLOCK_REALTIME, &start);
+                TPMV (&uplo, &trans, &diag, &n, a, x, &inc_x);
+                clock_gettime(CLOCK_REALTIME, &stop);
+                
+                fp = fopen(FILER,"w");
+                for (i = 0; i < n * COMPSIZE * abs(inc_x); i++) {
+                    fprintf(fp, FORMAT, x[i]);
+                }
+                fclose(fp);
+
+            }
+        }
+        else
+        {
+            fp = fopen(FILEA,"r");
+            for(j = 0; j < n; j++) {
+                for(i = 0; i < n * COMPSIZE; i++) {
+                    fscanf(fp, "%f\n", &a[(long)j + (long)i * (long)m * COMPSIZE]);
+                }
+            }
+            fclose(fp);
+            
+            fp = fopen(FILEX,"r");
+            for (i = 0; i < n * COMPSIZE * abs(inc_x); i++) {
+                fscanf(fp, "%f\n", &x[i]);
+            }
+            fclose(fp);
+
+            for (l = 0; l < loops; l++) {
+                clock_gettime(CLOCK_REALTIME, &start);
+                TPMV (&uplo, &trans, &diag, &n, a, x, &inc_x);
+                clock_gettime(CLOCK_REALTIME, &stop);
+                
+                fp = fopen(FILER,"w");
+                for (i = 0; i < n * COMPSIZE * abs(inc_x); i++) {
+                    fprintf(fp, FORMAT, x[i]);
+                }
+                fclose(fp);
+
             }
         }
 
-        for (i = 0; i < n * COMPSIZE * abs(inc_x); i++) {
-            x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-        }
-
-        for (l = 0; l < loops; l++) {
-            clock_gettime(CLOCK_REALTIME, &start);
-            TPMV (&uplo, &trans, &diag, &n, a, x, &inc_x);
-            clock_gettime(CLOCK_REALTIME, &stop);
-
-            time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_nsec - start.tv_nsec)) / 1.e9;
-            timeg += time1;
-        }
-
+        time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_nsec - start.tv_nsec)) / 1.e9;
+        timeg += time1;
         timeg /= loops;
         fprintf(stderr, " %10.2f MFlops %12.9f sec\n",
                 COMPSIZE * COMPSIZE * 1. * (double)n * (double)n / timeg / 1.e6, timeg);
