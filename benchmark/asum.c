@@ -38,14 +38,25 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef COMPLEX
 #ifdef DOUBLE
 #define ASUM   BLASFUNC(dzasum)
+#define FILEX   "dzasum_x.txt"
+#define FILER   "dzasum_res.txt"
 #else
 #define ASUM   BLASFUNC(scasum)
+#define FILEX   "scasum_x.txt"
+#define FILER   "scasum_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 #else
 #ifdef DOUBLE
 #define ASUM   BLASFUNC(dasum)
+#define FILEX   "dasum_x.txt"
+#define FILER   "dasum_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define ASUM   BLASFUNC(sasum)
+#define FILEX   "sasum_x.txt"
+#define FILER   "sasum_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 #endif
 
@@ -127,12 +138,13 @@ int main(int argc, char *argv[]){
   int from =   1;
   int to   = 200;
   int step =   1;
+  int random_input = 0; //Varun added
 
   struct timeval start, stop;
   double time1,timeg;
 
   argc--;argv++;
-
+  if (argc > 0) { random_input = atol(*argv);    argc--; argv++; }
   if (argc > 0) { from     = atol(*argv);		argc--; argv++;}
   if (argc > 0) { to       = MAX(atol(*argv), from);	argc--; argv++;}
   if (argc > 0) { step     = atol(*argv);		argc--; argv++;}
@@ -150,6 +162,7 @@ int main(int argc, char *argv[]){
 #ifdef linux
   srandom(getpid());
 #endif
+  FILE *fp;
 
   fprintf(stderr, "   SIZE       Flops\n");
 
@@ -163,21 +176,47 @@ int main(int argc, char *argv[]){
 
    for (l=0; l<loops; l++)
    {
+       if(random_input){
+	        fp = fopen(FILEX,"w");
+		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
+				x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+			        fprintf(fp, FORMAT, x[i]);
+		}
+	        fclose(fp);
 
-   	for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
-			x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-   	}
+		gettimeofday( &start, (struct timezone *)0);
 
-    	gettimeofday( &start, (struct timezone *)0);
+		result = ASUM (&m, x, &inc_x);
+	        fp = fopen(FILER,"w");
+	        fprintf(fp, FORMAT, x[i]);
+	        fclose(fp);
 
-    	result = ASUM (&m, x, &inc_x);
+		gettimeofday( &stop, (struct timezone *)0);
 
-    	gettimeofday( &stop, (struct timezone *)0);
+		time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
 
-    	time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
+		timeg += time1;
+       }
+	else{
+	        fp = fopen(FILEX,"r");
+		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
+			        fscanf(fp, "%f\n", &x[i]);
+		}
+	        fclose(fp);
 
-	timeg += time1;
+		gettimeofday( &start, (struct timezone *)0);
 
+		result = ASUM (&m, x, &inc_x);
+	        fp = fopen(FILER,"w");
+	        fprintf(fp, FORMAT, x[i]);
+	        fclose(fp);
+
+		gettimeofday( &stop, (struct timezone *)0);
+
+		time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
+
+		timeg += time1;
+	}
     }
 
     timeg /= loops;
