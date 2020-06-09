@@ -144,12 +144,13 @@ int main(int argc, char *argv[]){
   int from =   1;
   int to   = 200;
   int step =   1;
+  int random_input = 0; //Varun added
 
   struct timeval start, stop;
   double time1,timeg;
 
   argc--;argv++;
-
+  if (argc > 0) { random_input = atol(*argv);    argc--; argv++; }
   if (argc > 0) { from     = atol(*argv);       argc--; argv++;}
   if (argc > 0) { to       = MAX(atol(*argv), from);    argc--; argv++;}
   if (argc > 0) { step     = atol(*argv);       argc--; argv++;}
