@@ -39,16 +39,36 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef DOUBLE
 #define SYMV   BLASFUNC(dsymv)
+#define FILEA   "dsymv_a.txt"
+#define FILEX   "dsymv_x.txt"
+#define FILEY   "dsymv_y.txt"
+#define FILER   "dsymv_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define SYMV   BLASFUNC(ssymv)
+#define FILEA   "ssymv_a.txt"
+#define FILEX   "ssymv_x.txt"
+#define FILEY   "ssymv_y.txt"
+#define FILER   "ssymv_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 
 #else
 
 #ifdef DOUBLE
 #define SYMV   BLASFUNC(zsymv)
+#define FILEA   "zsymv_a.txt"
+#define FILEX   "zsymv_x.txt"
+#define FILEY   "zsymv_y.txt"
+#define FILER   "zsymv_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define SYMV   BLASFUNC(csymv)
+#define FILEA   "csymv_a.txt"
+#define FILEX   "csymv_x.txt"
+#define FILEY   "csymv_y.txt"
+#define FILER   "csymv_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 
 #endif
@@ -133,12 +153,13 @@ int main(int argc, char *argv[]){
   int from =   1;
   int to   = 200;
   int step =   1;
+  int random_input = 0; //Varun added
 
   struct timeval start, stop;
   double time1,timeg;
 
   argc--;argv++;
-
+  if (argc > 0) { random_input = atol(*argv);    argc--; argv++; }
   if (argc > 0) { from     = atol(*argv);		argc--; argv++;}
   if (argc > 0) { to       = MAX(atol(*argv), from);	argc--; argv++;}
   if (argc > 0) { step     = atol(*argv);		argc--; argv++;}
@@ -165,9 +186,9 @@ int main(int argc, char *argv[]){
 #ifdef linux
   srandom(getpid());
 #endif
-
+  
   fprintf(stderr, "   SIZE       Flops\n");
-
+  FILE *fp;
   for(m = from; m <= to; m += step)
   {
 
@@ -175,29 +196,78 @@ int main(int argc, char *argv[]){
 
    fprintf(stderr, " %6dx%d : ", (int)m,(int)m);
 
-   for(j = 0; j < m; j++){
-      		for(i = 0; i < m * COMPSIZE; i++){
-			a[(long)i + (long)j * (long)m * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-      		}
+   if(random_input)
+   {
+	   fp = fopen(FILEA,"w");
+	   for(j = 0; j < m; j++){
+			for(i = 0; i < m * COMPSIZE; i++){
+				a[(long)i + (long)j * (long)m * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+				fprintf(fpa, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
+			}
+	   }
+	   fclose(fp);
    }
+   else
+   {
+	   fp = fopen(FILEA,"r");
+	   for(j = 0; j < m; j++){
+			for(i = 0; i < m * COMPSIZE; i++){
+				fscanf(fp, "%f\n", &a[(long)i + (long)j * (long)m * COMPSIZE]);
+			}
+	   }
+	   fclose(fp);
+   }
+
 
 
     for (l=0; l<loops; l++)
     {
+        if(random_input)
+	{
+		fp = fopen(FILEX,"w");
+		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
+				x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+			fprintf(fp, FORMAT, x[i]);
+		}
+		fclose(fp);
+                fp = fopen(FILEY,"w");
+		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
+				y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+			fprintf(fp, FORMAT, y[i]);
+		}
+		fclose(fp);
+		gettimeofday( &start, (struct timezone *)0);
 
-   	for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
-			x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-   	}
+		SYMV (&uplo, &m, alpha, a, &m, x, &inc_x, beta, y, &inc_y );
+		fp = fopen(FILER,"w");
+		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
+			fprintf(fp, FORMAT, y[i]);
+		}
+		fclose(fp);
+		gettimeofday( &stop, (struct timezone *)0);
+	}
+	else
+	{
+		fp = fopen(FILEX,"r");
+		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
+			fscanf(fpa, "%f\n", &x[i]);
+		}
+		fclose(fp);
+                fp = fopen(FILEY,"r");
+		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
+			fscanf(fpa, "%f\n", &y[i]);
+		}
+		fclose(fp);
+		gettimeofday( &start, (struct timezone *)0);
 
-   	for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
-			y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-   	}
-    	gettimeofday( &start, (struct timezone *)0);
-
-    	SYMV (&uplo, &m, alpha, a, &m, x, &inc_x, beta, y, &inc_y );
-
-    	gettimeofday( &stop, (struct timezone *)0);
-
+		SYMV (&uplo, &m, alpha, a, &m, x, &inc_x, beta, y, &inc_y );
+		fp = fopen(FILER,"w");
+		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
+			fprintf(fp, FORMAT, y[i]);
+		}
+		fclose(fp);
+		gettimeofday( &stop, (struct timezone *)0);
+	}
     	time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
 
 	timeg += time1;
