@@ -38,8 +38,16 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef DOUBLE
 #define DOT   BLASFUNC(ddot)
+#define FILEX   "ddot_x.txt"
+#define FILEY   "ddot_y.txt"
+#define FILER   "ddot_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define DOT   BLASFUNC(sdot)
+#define FILEX   "sdot_x.txt"
+#define FILEY   "sdot_y.txt"
+#define FILER   "sdot_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 
 
@@ -121,12 +129,13 @@ int main(int argc, char *argv[]){
   int from =   1;
   int to   = 200;
   int step =   1;
+  int random_input = 0; //Varun added
 
   struct timeval start, stop;
   double time1,timeg;
 
   argc--;argv++;
-
+  if (argc > 0) { random_input = atol(*argv);    argc--; argv++; }
   if (argc > 0) { from     = atol(*argv);		argc--; argv++;}
   if (argc > 0) { to       = MAX(atol(*argv), from);	argc--; argv++;}
   if (argc > 0) { step     = atol(*argv);		argc--; argv++;}
@@ -136,6 +145,7 @@ int main(int argc, char *argv[]){
   if ((p = getenv("OPENBLAS_INCY")))   inc_y = atoi(p);
 
   fprintf(stderr, "From : %3d  To : %3d Step = %3d Inc_x = %d Inc_y = %d Loops = %d\n", from, to, step,inc_x,inc_y,loops);
+  
 
   if (( x = (FLOAT *)malloc(sizeof(FLOAT) * to * abs(inc_x) * COMPSIZE)) == NULL){
     fprintf(stderr,"Out of Memory!!\n");exit(1);
@@ -150,6 +160,7 @@ int main(int argc, char *argv[]){
 #endif
 
   fprintf(stderr, "   SIZE       Flops\n");
+  FILE *fp;
 
   for(m = from; m <= to; m += step)
   {
@@ -161,23 +172,63 @@ int main(int argc, char *argv[]){
 
    for (l=0; l<loops; l++)
    {
+        if(random_input)
+	{
+		fp = fopen(FILEX,"w");
+		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
+				x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+				fprintf(fp, FORMAT, x[i]);
+		}
+		fclose(fp);
 
-   	for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
-			x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-   	}
+		fp = fopen(FILEY,"w");
+		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
+				y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+				fprintf(fp, FORMAT, y[i]);
+		}
+		fclose(fp);
+		gettimeofday( &start, (struct timezone *)0);
 
-   	for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
-			y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-   	}
-    	gettimeofday( &start, (struct timezone *)0);
+		result = DOT (&m, x, &inc_x, y, &inc_y );
+		fp = fopen(FILER,"w");
+		fprintf(fp, FORMAT, result);
+		fclose(fp);
 
-    	result = DOT (&m, x, &inc_x, y, &inc_y );
+		gettimeofday( &stop, (struct timezone *)0);
 
-    	gettimeofday( &stop, (struct timezone *)0);
+		time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
 
-    	time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
+		timeg += time1;
+	}
+	else
+	{
+		fp = fopen(FILEX,"r");
+		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
+// 				x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+				fscanf(fp, "%f\n", &x[i]);
+		}
+		fclose(fp);
 
-	timeg += time1;
+		fp = fopen(FILEY,"r");
+		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
+// 				y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+				fscanf(fp, "%f\n", &y[i]);
+		}
+		fclose(fp);
+		gettimeofday( &start, (struct timezone *)0);
+
+		result = DOT (&m, x, &inc_x, y, &inc_y );
+		fp = fopen(FILER,"w");
+		fprintf(fp, FORMAT, result);
+		fclose(fp);
+
+		gettimeofday( &stop, (struct timezone *)0);
+
+		time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
+
+		timeg += time1;
+	
+	}
 
     }
 
