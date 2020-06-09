@@ -39,16 +39,32 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef DOUBLE
 #define SYRK   BLASFUNC(dsyrk)
+#define FILEA   "dsyrk_a.txt"
+#define FILEC   "dsyrk_c.txt"
+#define FILER   "dsyrk_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define SYRK   BLASFUNC(ssyrk)
+#define FILEA   "ssyrk_a.txt"
+#define FILEC   "ssyrk_c.txt"
+#define FILER   "ssyrk_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 
 #else
 
 #ifdef DOUBLE
 #define SYRK   BLASFUNC(zsyrk)
+#define FILEA   "zsyrk_a.txt"
+#define FILEC   "zsyrk_c.txt"
+#define FILER   "zsyrk_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define SYRK   BLASFUNC(csyrk)
+#define FILEA   "csyrk_a.txt"
+#define FILEC   "csyrk_c.txt"
+#define FILER   "csyrk_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 
 #endif
@@ -136,12 +152,14 @@ int main(int argc, char *argv[]){
   int from =   1;
   int to   = 200;
   int step =   1;
+  int random_input = 0; //Varun added
+
 
   struct timeval start, stop;
   double time1;
 
   argc--;argv++;
-
+  if (argc > 0) { random_input = atol(*argv);    argc--; argv++; }
   if (argc > 0) { from     = atol(*argv);		argc--; argv++;}
   if (argc > 0) { to       = MAX(atol(*argv), from);	argc--; argv++;}
   if (argc > 0) { step     = atol(*argv);		argc--; argv++;}
@@ -164,24 +182,68 @@ int main(int argc, char *argv[]){
 #endif
 
   fprintf(stderr, "   SIZE       Flops\n");
-
+  FILE *fpa;
+  FILE *fpc;
   for(m = from; m <= to; m += step)
   {
 
     fprintf(stderr, " %6d : ", (int)m);
 
-    for(j = 0; j < m; j++){
-      for(i = 0; i < m * COMPSIZE; i++){
-	a[(long)i + (long)j * (long)m * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-	c[(long)i + (long)j * (long)m * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-      }
+    if(random_input)
+    {
+	    fpa = fopen(FILEA,"w");
+	    fpc = fopen(FILEC,"w");
+	    for(j = 0; j < m; j++){
+	      for(i = 0; i < m * COMPSIZE; i++){
+		a[(long)i + (long)j * (long)m * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+		c[(long)i + (long)j * (long)m * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+		fprintf(fpa, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
+		fprintf(fpc, FORMAT, c[(long)i + (long)j * (long)m * COMPSIZE]);
+	      }
+	    }
+	    fclose(fpa);
+	    fclose(fpc);
+	    
+	    gettimeofday( &start, (struct timezone *)0);
+
+	    SYRK (&uplo, &trans, &m, &m, alpha, a, &m, beta, c, &m );
+
+	    gettimeofday( &stop, (struct timezone *)0);
+	    fpc = fopen(FILER,"w");
+	    for(j = 0; j < m; j++){
+	      for(i = 0; i < m * COMPSIZE; i++){
+		fprintf(fpc, FORMAT, c[(long)i + (long)j * (long)m * COMPSIZE]);
+	      }
+	    }
+	    fclose(fpc);
+    }
+    else
+    {
+	    fpa = fopen(FILEA,"w");
+	    fpc = fopen(FILEC,"w");
+	    for(j = 0; j < m; j++){
+	      for(i = 0; i < m * COMPSIZE; i++){
+		fscanf(fpa, "%f\n", &a[(long)i + (long)j * (long)m * COMPSIZE]);
+		fscanf(fpc, "%f\n", &c[(long)i + (long)j * (long)m * COMPSIZE]);
+	      }
+	    }
+	    fclose(fpa);
+	    fclose(fpc);
+	    
+	    gettimeofday( &start, (struct timezone *)0);
+
+	    SYRK (&uplo, &trans, &m, &m, alpha, a, &m, beta, c, &m );
+
+	    gettimeofday( &stop, (struct timezone *)0);
+	    fpc = fopen(FILER,"w");
+	    for(j = 0; j < m; j++){
+	      for(i = 0; i < m * COMPSIZE; i++){
+		fprintf(fpc, FORMAT, c[(long)i + (long)j * (long)m * COMPSIZE]);
+	      }
+	    }
+	    fclose(fpc);
     }
 
-    gettimeofday( &start, (struct timezone *)0);
-
-    SYRK (&uplo, &trans, &m, &m, alpha, a, &m, beta, c, &m );
-
-    gettimeofday( &stop, (struct timezone *)0);
 
     time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
 
