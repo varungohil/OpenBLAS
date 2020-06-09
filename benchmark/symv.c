@@ -202,7 +202,7 @@ int main(int argc, char *argv[]){
 	   for(j = 0; j < m; j++){
 			for(i = 0; i < m * COMPSIZE; i++){
 				a[(long)i + (long)j * (long)m * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-				fprintf(fpa, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
+				fprintf(fp, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
 			}
 	   }
 	   fclose(fp);
@@ -250,12 +250,12 @@ int main(int argc, char *argv[]){
 	{
 		fp = fopen(FILEX,"r");
 		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
-			fscanf(fpa, "%f\n", &x[i]);
+			fscanf(fp, "%f\n", &x[i]);
 		}
 		fclose(fp);
                 fp = fopen(FILEY,"r");
 		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
-			fscanf(fpa, "%f\n", &y[i]);
+			fscanf(fp, "%f\n", &y[i]);
 		}
 		fclose(fp);
 		gettimeofday( &start, (struct timezone *)0);
