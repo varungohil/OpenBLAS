@@ -40,16 +40,32 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef DOUBLE
 #define SPMV   BLASFUNC(dspmv)
+#define FILEA   "dspmv_a.txt"
+#define FILEX   "dspmv_x.txt"
+#define FILEY   "dspmv_y.txt"
+#define FILER   "dspmv_res.txt"
 #else
 #define SPMV   BLASFUNC(sspmv)
+#define FILEA   "sspmv_a.txt"
+#define FILEX   "sspmv_x.txt"
+#define FILEY   "sspmv_y.txt"
+#define FILER   "sspmv_res.txt"
 #endif
 
 #else
 
 #ifdef DOUBLE
 #define SPMV   BLASFUNC(zspmv)
+#define FILEA   "zspmv_a.txt"
+#define FILEX   "zspmv_x.txt"
+#define FILEY   "zspmv_y.txt"
+#define FILER   "zspmv_res.txt"
 #else
 #define SPMV   BLASFUNC(cspmv)
+#define FILEA   "cspmv_a.txt"
+#define FILEX   "cspmv_x.txt"
+#define FILEY   "cspmv_y.txt"
+#define FILER   "cspmv_res.txt"
 #endif
 
 #endif
@@ -134,12 +150,13 @@ int main(int argc, char *argv[]){
   int from =   1;
   int to   = 200;
   int step =   1;
+  int random_input = 0; //Varun added
 
   struct timeval start, stop;
   double time1,timeg;
 
   argc--;argv++;
-
+  if (argc > 0) { random_input = atol(*argv);    argc--; argv++; }
   if (argc > 0) { from     = atol(*argv);		argc--; argv++;}
   if (argc > 0) { to       = MAX(atol(*argv), from);	argc--; argv++;}
   if (argc > 0) { step     = atol(*argv);		argc--; argv++;}
@@ -166,7 +183,7 @@ int main(int argc, char *argv[]){
 #ifdef linux
   srandom(getpid());
 #endif
-
+  FILE *fp;
   fprintf(stderr, "   SIZE       Flops\n");
 
   for(m = from; m <= to; m += step)
@@ -175,35 +192,92 @@ int main(int argc, char *argv[]){
    timeg=0;
 
    fprintf(stderr, " %6dx%d : ", (int)m,(int)m);
+	  
+   if(random_input)
+   {
+	   fp = fopen(FILEA,"w");
+	   for(j = 0; j < m; j++){
+			for(i = 0; i < m * COMPSIZE; i++){
+				a[(long)i + (long)j * (long)m * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+				fprintf(fp, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
+			}
+	   }
+	   fclose(fp);
 
-   for(j = 0; j < m; j++){
-      		for(i = 0; i < m * COMPSIZE; i++){
-			a[(long)i + (long)j * (long)m * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-      		}
+
+	    for (l=0; l<loops; l++)
+	    {
+                fp = fopen(FILEX,"w");
+		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
+				x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+			        fprintf(fp, FORMAT, x[i]);
+		}
+		fclose(fp);
+                
+		fp = fopen(FILEY,"w");
+		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
+				y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+			        fprintf(fp, FORMAT, y[i]);
+		}
+		fclose(fp);
+		gettimeofday( &start, (struct timezone *)0);
+
+		SPMV (&uplo, &m, alpha, a, x, &inc_x, beta, y, &inc_y );
+
+		gettimeofday( &stop, (struct timezone *)0);
+		fp = fopen(FILER,"w");
+		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
+			        fprintf(fp, FORMAT, y[i]);
+		}
+		fclose(fp);
+		time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
+
+		timeg += time1;
+
+	    }
+
+   }
+   else
+   {
+	   fp = fopen(FILEA,"r");
+	   for(j = 0; j < m; j++){
+			for(i = 0; i < m * COMPSIZE; i++){
+				fscanf(fp, "%f\n", &a[(long)i + (long)j * (long)m * COMPSIZE]);
+			}
+	   }
+	   fclose(fp);
+
+
+	    for (l=0; l<loops; l++)
+	    {
+                fp = fopen(FILEX,"r");
+		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
+			        fscanf(fp, "%f\n", &c[i]);
+		}
+		fclose(fp);
+                
+		fp = fopen(FILEY,"r");
+		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
+			        fscanf(fp, "%f\n", &c[i]);
+		}
+		fclose(fp);
+		gettimeofday( &start, (struct timezone *)0);
+
+		SPMV (&uplo, &m, alpha, a, x, &inc_x, beta, y, &inc_y );
+
+		gettimeofday( &stop, (struct timezone *)0);
+		fp = fopen(FILER,"w");
+		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
+			        fprintf(fp, FORMAT, y[i]);
+		}
+		fclose(fp);
+		time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
+
+		timeg += time1;
+
+	    }
    }
 
-
-    for (l=0; l<loops; l++)
-    {
-
-   	for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
-			x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-   	}
-
-   	for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
-			y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-   	}
-    	gettimeofday( &start, (struct timezone *)0);
-
-    	SPMV (&uplo, &m, alpha, a, x, &inc_x, beta, y, &inc_y );
-
-    	gettimeofday( &stop, (struct timezone *)0);
-
-    	time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
-
-	timeg += time1;
-
-    }
 
     timeg /= loops;
 
