@@ -38,16 +38,32 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef DOUBLE
 #define TRMV   BLASFUNC(dtrmv)
+#define FILEA   "dtrmv_a.txt"
+#define FILEX   "dtrmv_x.txt"
+#define FILER   "dtrmv_res.txt"
+#define FORMAT  "%lf\n
 #else
 #define TRMV   BLASFUNC(strmv)
+#define FILEA   "strmv_a.txt"
+#define FILEX   "strmv_x.txt"
+#define FILER   "strmv_res.txt"
+#define FORMAT  "%.14f\n
 #endif
 
 #else
 
 #ifdef DOUBLE
 #define TRMV   BLASFUNC(ztrmv)
+#define FILEA   "ztrmv_a.txt"
+#define FILEX   "ztrmv_x.txt"
+#define FILER   "ztrmv_res.txt"
+#define FORMAT  "%.14f\n
 #else
 #define TRMV   BLASFUNC(ctrmv)
+#define FILEA   "ctrmv_a.txt"
+#define FILEX   "ctrmv_x.txt"
+#define FILER   "ctrmv_res.txt"
+#define FORMAT  "%.14f\n
 #endif
 
 #endif
@@ -111,12 +127,13 @@ int main(int argc, char *argv[])
     int from =   1;
     int to   = 200;
     int step =   1;
+    int random_input = 0; //Varun added
 
     struct timespec start = { 0, 0 }, stop = { 0, 0 };
     double time1, timeg;
 
     argc--;argv++;
-
+    if (argc > 0) { random_input = atol(*argv);    argc--; argv++; }
     if (argc > 0) { from     = atol(*argv);        argc--; argv++;}
     if (argc > 0) { to       = MAX(atol(*argv), from);    argc--; argv++;}
     if (argc > 0) { step     = atol(*argv);        argc--; argv++;}
@@ -137,28 +154,74 @@ int main(int argc, char *argv[])
 #endif
 
     fprintf(stderr, "   SIZE       Flops\n");
-
+    FILE *fp;
     for(n = from; n <= to; n += step) {
         timeg=0;
 
         fprintf(stderr, " %6d : ", (int)n);
-        for(j = 0; j < n; j++) {
-            for(i = 0; i < n * COMPSIZE; i++) {
-                a[(long)i + (long)j * (long)n * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+        if(random_input)
+        {
+            fp = fopen(FILEA,"w");
+            for(j = 0; j < n; j++) {
+                for(i = 0; i < n * COMPSIZE; i++) {
+                    a[(long)i + (long)j * (long)n * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+                    fprintf(fpa, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
+                }
+            }
+            fclose(fp);
+            
+            fp = fopen(FILEX,"w");
+            for (i = 0; i < n * COMPSIZE * abs(inc_x); i++) {
+                x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+                fprintf(fp, FORMAT, x[i]);
+            }
+            fclose(fp);
+
+            for (l = 0; l < loops; l++) {
+                clock_gettime(CLOCK_REALTIME, &start);
+                TRMV (&uplo, &trans, &diag, &n, a, &n, x, &inc_x);
+                clock_gettime(CLOCK_REALTIME, &stop);
+
+                fp = fopen(FILER,"w");
+                for (i = 0; i < n * COMPSIZE * abs(inc_x); i++) {
+                    fprintf(fp, FORMAT, x[i]);
+                }
+                fclose(fp);
+                
+                time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_nsec - start.tv_nsec)) / 1.e9;
+                timeg += time1;
             }
         }
+        else
+        {
+            fp = fopen(FILEA,"r");
+            for(j = 0; j < n; j++) {
+                for(i = 0; i < n * COMPSIZE; i++) {
+                    fscanf(fp, "%f\n", &a[(long)i + (long)j * (long)m * COMPSIZE]);
+                }
+            }
+            fclose(fp);
+            
+            fp = fopen(FILEX,"r");
+            for (i = 0; i < n * COMPSIZE * abs(inc_x); i++) {
+                fscanf(fp, "%f\n", &x[i]);
+            }
+            fclose(fp);
 
-        for (i = 0; i < n * COMPSIZE * abs(inc_x); i++) {
-            x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-        }
+            for (l = 0; l < loops; l++) {
+                clock_gettime(CLOCK_REALTIME, &start);
+                TRMV (&uplo, &trans, &diag, &n, a, &n, x, &inc_x);
+                clock_gettime(CLOCK_REALTIME, &stop);
 
-        for (l = 0; l < loops; l++) {
-            clock_gettime(CLOCK_REALTIME, &start);
-            TRMV (&uplo, &trans, &diag, &n, a, &n, x, &inc_x);
-            clock_gettime(CLOCK_REALTIME, &stop);
-
-            time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_nsec - start.tv_nsec)) / 1.e9;
-            timeg += time1;
+                fp = fopen(FILER,"w");
+                for (i = 0; i < n * COMPSIZE * abs(inc_x); i++) {
+                    fprintf(fp, FORMAT, x[i]);
+                }
+                fclose(fp);
+                
+                time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_nsec - start.tv_nsec)) / 1.e9;
+                timeg += time1;
+            }
         }
 
         timeg /= loops;
