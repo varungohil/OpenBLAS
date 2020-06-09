@@ -39,16 +39,36 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef DOUBLE
 #define GEMV   BLASFUNC(dgemv)
+#define FILEA   "dgemv_a.txt"
+#define FILEX   "dgemv_x.txt"
+#define FILEY   "dgemv_y.txt"
+#define FILER   "dgemv_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define GEMV   BLASFUNC(sgemv)
+#define FILEA   "sgemv_a.txt"
+#define FILEX   "sgemv_x.txt"
+#define FILEY   "sgemv_y.txt"
+#define FILER   "sgemv_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 
 #else
 
 #ifdef DOUBLE
 #define GEMV   BLASFUNC(zgemv)
+#define FILEA   "zgemv_a.txt"
+#define FILEX   "zgemv_x.txt"
+#define FILEY   "zgemv_y.txt"
+#define FILER   "zgemv_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define GEMV   BLASFUNC(cgemv)
+#define FILEA   "cgemv_a.txt"
+#define FILEX   "cgemv_x.txt"
+#define FILEY   "cgemv_y.txt"
+#define FILER   "cgemv_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 
 #endif
@@ -136,12 +156,13 @@ int main(int argc, char *argv[]){
   int from =   1;
   int to   = 200;
   int step =   1;
+  int random_input = 0; //Varun added
 
   struct timeval start, stop;
   double time1,timeg;
 
   argc--;argv++;
-
+  if (argc > 0) { random_input = atol(*argv);    argc--; argv++; }
   if (argc > 0) { from     = atol(*argv);		argc--; argv++;}
   if (argc > 0) { to       = MAX(atol(*argv), from);	argc--; argv++;}
   if (argc > 0) { step     = atol(*argv);		argc--; argv++;}
@@ -186,43 +207,57 @@ int main(int argc, char *argv[]){
 #endif
 
   fprintf(stderr, "   SIZE       Flops\n");
+  FILE *fp; //Varun added
 
   if (has_param_m == 0)
   {
 
   	for(m = from; m <= to; m += step)
   	{
-   		timeg=0;
-   		if ( has_param_n == 0 ) n = m;
-   		fprintf(stderr, " %6dx%d : ", (int)m,(int)n);
-   		for(j = 0; j < m; j++){
-      			for(i = 0; i < n * COMPSIZE; i++){
-				a[(long)j + (long)i * (long)m * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-      			}
-   		}
+   		if(random_input){
+			timeg=0;
+			if ( has_param_n == 0 ) n = m;
+			fprintf(stderr, " %6dx%d : ", (int)m,(int)n);
+			fp = fopen(FILEA,"w");
+			for(j = 0; j < m; j++){
+				for(i = 0; i < n * COMPSIZE; i++){
+					a[(long)j + (long)i * (long)m * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+					fprintf(fp, FORMAT, a[(long)j + (long)i * (long)m * COMPSIZE]);
+				}
+			}
+			fclose(fp);
 
-    		for (l=0; l<loops; l++)
-    		{
+			for (l=0; l<loops; l++)
+			{
+                                fp = fopen(FILEX,"w");
+				for(i = 0; i < n * COMPSIZE * abs(inc_x); i++){
+					x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+					fprintf(fp, FORMAT, x[i]);
+				}
+				fclose(fp);
+                                fp = fopen(FILEY,"w");
+				for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
+					y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+					fprintf(fp, FORMAT, y[i]);
+				}
+				fclose(fp);
+				gettimeofday( &start, (struct timezone *)0);
+				GEMV (&trans, &m, &n, alpha, a, &m, x, &inc_x, beta, y, &inc_y );
+				gettimeofday( &stop, (struct timezone *)0);
+				time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
+				timeg += time1;
+                                fp = fopen(FILER,"w");
+                                for (int q = 0; q < m * COMPSIZE * abs(inc_y); q++) //Check
+                                {
+	                           fprintf(fp, FORMAT, y[q]);
+                                }
+                                 fclose(fp);
+			}
 
-   			for(i = 0; i < n * COMPSIZE * abs(inc_x); i++){
-				x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-   			}
+			timeg /= loops;
 
-   			for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
-				y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-   			}
-    			gettimeofday( &start, (struct timezone *)0);
-    			GEMV (&trans, &m, &n, alpha, a, &m, x, &inc_x, beta, y, &inc_y );
-    			gettimeofday( &stop, (struct timezone *)0);
-    			time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
-			timeg += time1;
-
-    		}
-
-    		timeg /= loops;
-
-    		fprintf(stderr, " %10.2f MFlops %10.6f sec\n", COMPSIZE * COMPSIZE * 2. * (double)m * (double)n / timeg * 1.e-6, timeg);
-
+			fprintf(stderr, " %10.2f MFlops %10.6f sec\n", COMPSIZE * COMPSIZE * 2. * (double)m * (double)n / timeg * 1.e-6, timeg);
+		}
   	}
   }
   else
