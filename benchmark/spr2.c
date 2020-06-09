@@ -37,17 +37,17 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef DOUBLE
 #define SPR2   BLASFUNC(dspr2)
-#define FILEA   "dspr_a.txt"
-#define FILEB   "dspr_b.txt"
-#define FILEC   "dspr_c.txt"
-#define FILER   "dspr_res.txt"
+#define FILEA   "dspr2_a.txt"
+#define FILEB   "dspr2_b.txt"
+#define FILEC   "dspr2_c.txt"
+#define FILER   "dspr2_res.txt"
 #define FORMAT  "%lf\n"
 #else
 #define SPR2   BLASFUNC(sspr2)
-#define FILEA   "sspr_a.txt"
-#define FILEB   "sspr_b.txt"
-#define FILEC   "sspr_c.txt"
-#define FILER   "sspr_res.txt"
+#define FILEA   "sspr2_a.txt"
+#define FILEB   "sspr2_b.txt"
+#define FILEC   "sspr2_c.txt"
+#define FILER   "sspr2_res.txt"
 #define FORMAT  "%.14f\n"
 #endif
 
