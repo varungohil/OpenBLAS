@@ -174,6 +174,7 @@ int main(int argc, char *argv[]){
 #endif
 
   fprintf(stderr, "   SIZE       Flops\n");
+  FILE *fp;
 
   for(m = from; m <= to; m += step)
   {
@@ -182,27 +183,76 @@ int main(int argc, char *argv[]){
 
     fprintf(stderr, " %6d : ", (int)m);
 
-
-    for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
-            x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-    }
-
-    for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
-            y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-    }
-
-    for (l=0; l<loops; l++)
+    
+    if(random_input)
     {
-        gettimeofday( &start, (struct timezone *)0);
+      fp = fopen(FILEX,"w");
+      for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
+              x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+              fprintf(fp, FORMAT, x[i]);
+      }
+      fclose(fp);
+      
+      fp = fopen(FILEY,"w");
+      for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
+              y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+              fprintf(fp, FORMAT, y[i]);
+      }
+      fclose(fp);
 
-        AXPBY (&m, alpha, x, &inc_x, beta, y, &inc_y );
+      for (l=0; l<loops; l++)
+      {
+          gettimeofday( &start, (struct timezone *)0);
 
-        gettimeofday( &stop, (struct timezone *)0);
+          AXPBY (&m, alpha, x, &inc_x, beta, y, &inc_y );
+        
+          fp = fopen(FILER,"w");
+          for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
+                  fprintf(fp, FORMAT, y[i]);
+          }
+          fclose(fp);
 
-        time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
+          gettimeofday( &stop, (struct timezone *)0);
 
-        timeg += time1;
+          time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
 
+          timeg += time1;
+
+      }
+    }
+    else
+    {
+      fp = fopen(FILEX,"r");
+      for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
+              fscanf(fp, "%f\n", &x[i]);
+      }
+      fclose(fp);
+      
+      fp = fopen(FILEY,"r");
+      for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
+        fscanf(fp, "%f\n", &y[i]);
+      }
+      fclose(fp);
+
+      for (l=0; l<loops; l++)
+      {
+          gettimeofday( &start, (struct timezone *)0);
+
+          AXPBY (&m, alpha, x, &inc_x, beta, y, &inc_y );
+        
+          fp = fopen(FILER,"w");
+          for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
+                  fprintf(fp, FORMAT, y[i]);
+          }
+          fclose(fp);
+
+          gettimeofday( &stop, (struct timezone *)0);
+
+          time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
+
+          timeg += time1;
+
+      }
     }
 
     timeg /= loops;
