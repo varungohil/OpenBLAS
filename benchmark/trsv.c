@@ -41,16 +41,33 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef DOUBLE
 #define TRSV   BLASFUNC(dtrsv)
+#define FILEA   "dtrsv_a.txt"
+#define FILEX   "dtrsv_x.txt"
+#define FILER   "dtrsv_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define TRSV   BLASFUNC(strsv)
+#define FILEA   "strsv_a.txt"
+#define FILEX   "strsv_x.txt"
+#define FILER   "strsv_res.txt"
+#define FORMAT  "%.14f\n"
+
 #endif
 
 #else
 
 #ifdef DOUBLE
 #define TRSV   BLASFUNC(ztrsv)
+#define FILEA   "ztrsv_a.txt"
+#define FILEX   "ztrsv_x.txt"
+#define FILER   "ztrsv_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define TRSV   BLASFUNC(ctrsv)
+#define FILEA   "ctrsv_a.txt"
+#define FILEX   "ctrsv_x.txt"
+#define FILER   "ctrsv_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 
 #endif
@@ -132,6 +149,7 @@ int main(int argc, char *argv[]){
   int from =   1;
   int to   = 200;
   int step =   1;
+  int random_input = 0; //Varun added
 
   struct timespec time_start, time_end;
   time_t seconds = 0;
@@ -140,7 +158,7 @@ int main(int argc, char *argv[]){
   long long nanos = 0;
 
   argc--;argv++;
-
+  if (argc > 0) { random_input = atol(*argv);    argc--; argv++; }
   if (argc > 0) { from     = atol(*argv);		argc--; argv++;}
   if (argc > 0) { to       = MAX(atol(*argv), from);	argc--; argv++;}
   if (argc > 0) { step     = atol(*argv);		argc--; argv++;}
@@ -165,7 +183,7 @@ int main(int argc, char *argv[]){
 
   fprintf(stderr, "   SIZE       Flops\n");
   fprintf(stderr, "============================================\n");
-
+  FILE *fp;
   for(n = from; n <= to; n += step)
   {
       timeg=0;
@@ -176,30 +194,77 @@ int main(int argc, char *argv[]){
       if (( x = (FLOAT *)malloc(sizeof(FLOAT) * n * abs(inc_x) * COMPSIZE)) == NULL){
           fprintf(stderr,"Out of Memory!!\n");exit(1);
       }
+      
+      if(random_input)
+      {
+	      fp = fopen(FILEA,"w");
+	      for(j = 0; j < n; j++){
+		  for(i = 0; i < n * COMPSIZE; i++){
+		      a[i + j * n * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+			  fprintf(fp, FORMAT, a[i + j * n * COMPSIZE]);
+		  }
+	      }
+	      fclose(fp);
+              fp = fopen(FILEX,"w");
+	      for(i = 0; i < n * COMPSIZE * abs(inc_x); i++){
+		  x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+		   fprintf(fp, FORMAT, x[i]);
+	      }
+	      fclose(fp);
 
-      for(j = 0; j < n; j++){
-          for(i = 0; i < n * COMPSIZE; i++){
-              a[i + j * n * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-          }
+	      for(l =0;l< loops;l++){
+
+		  clock_gettime(CLOCK_PROCESS_CPUTIME_ID,&time_start);
+
+		  TRSV(&uplo,&transa,&diag,&n,a,&n,x,&inc_x);
+
+		  clock_gettime(CLOCK_PROCESS_CPUTIME_ID,&time_end);
+		  nanos = time_end.tv_nsec - time_start.tv_nsec;
+		  seconds = time_end.tv_sec - time_start.tv_sec;
+
+		  time1 = seconds + nanos /1.e9;
+		  timeg += time1;
+	      }
+              fp = fopen(FILER,"w");
+	      for(i = 0; i < n * COMPSIZE * abs(inc_x); i++){
+		   fprintf(fp, FORMAT, x[i]);
+	      }
+	      fclose(fp);
+      }
+      else
+      {
+	      for(j = 0; j < n; j++){
+		  for(i = 0; i < n * COMPSIZE; i++){
+			  fscanf(fp, "%f\n", &a[i + j * n * COMPSIZE]);
+		  }
+	      }
+	      fclose(fp);
+              fp = fopen(FILEX,"w");
+	      for(i = 0; i < n * COMPSIZE * abs(inc_x); i++){
+		   fscanf(fpa, "%f\n", &x[i]);
+	      }
+	      fclose(fp);
+
+	      for(l =0;l< loops;l++){
+
+		  clock_gettime(CLOCK_PROCESS_CPUTIME_ID,&time_start);
+
+		  TRSV(&uplo,&transa,&diag,&n,a,&n,x,&inc_x);
+
+		  clock_gettime(CLOCK_PROCESS_CPUTIME_ID,&time_end);
+		  nanos = time_end.tv_nsec - time_start.tv_nsec;
+		  seconds = time_end.tv_sec - time_start.tv_sec;
+
+		  time1 = seconds + nanos /1.e9;
+		  timeg += time1;
+	      }
+              fp = fopen(FILER,"w");
+	      for(i = 0; i < n * COMPSIZE * abs(inc_x); i++){
+		   fprintf(fp, FORMAT, x[i]);
+	      }
+	      fclose(fp);
       }
 
-      for(i = 0; i < n * COMPSIZE * abs(inc_x); i++){
-          x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-      }
-
-      for(l =0;l< loops;l++){
-
-          clock_gettime(CLOCK_PROCESS_CPUTIME_ID,&time_start);
-
-          TRSV(&uplo,&transa,&diag,&n,a,&n,x,&inc_x);
-
-          clock_gettime(CLOCK_PROCESS_CPUTIME_ID,&time_end);
-          nanos = time_end.tv_nsec - time_start.tv_nsec;
-          seconds = time_end.tv_sec - time_start.tv_sec;
-
-          time1 = seconds + nanos /1.e9;
-          timeg += time1;
-      }
 
 
       timeg /= loops;
