@@ -38,14 +38,30 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef COMPLEX
 #ifdef DOUBLE
 #define AXPY   BLASFUNC(zaxpy)
+#define FILEX   "zaxpy_x.txt"
+#define FILEY   "zaxpy_y.txt"
+#define FILER   "zaxpy_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define AXPY   BLASFUNC(caxpy)
+#define FILEX   "caxpy_x.txt"
+#define FILEY   "caxpy_y.txt"
+#define FILER   "caxpy_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 #else
 #ifdef DOUBLE
 #define AXPY   BLASFUNC(daxpy)
+#define FILEX   "daxpy_x.txt"
+#define FILEY   "daxpy_y.txt"
+#define FILER   "daxpy_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define AXPY   BLASFUNC(saxpy)
+#define FILEX   "saxpy_x.txt"
+#define FILEY   "saxpy_y.txt"
+#define FILER   "saxpy_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 #endif
 
@@ -127,12 +143,13 @@ int main(int argc, char *argv[]){
   int from =   1;
   int to   = 200;
   int step =   1;
-
+  int random_input = 0;
+	
   struct timespec start, stop;
   double time1,timeg;
 
   argc--;argv++;
-
+  if (argc > 0) { random_input = atol(*argv);    argc--; argv++; }
   if (argc > 0) { from     = atol(*argv);		argc--; argv++;}
   if (argc > 0) { to       = MAX(atol(*argv), from);	argc--; argv++;}
   if (argc > 0) { step     = atol(*argv);		argc--; argv++;}
@@ -164,27 +181,67 @@ int main(int argc, char *argv[]){
 
    fprintf(stderr, " %6d : ", (int)m);
 
-
+   FILE *fp;
    for (l=0; l<loops; l++)
    {
+        if(random_input)
+	{
+		fp = fopen(FILEX,"w");
+		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
+				x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+			fprintf(fp, FORMAT, x[i]);
+		}
+		fclose(fp);
 
-   	for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
-			x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-   	}
+		fp = fopen(FILEY,"w");
+		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
+				y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+			fprintf(fp, FORMAT, y[i]);
+		}
+		fclose(fp);
+		clock_gettime( CLOCK_REALTIME, &start);
 
-   	for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
-			y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-   	}
-    	clock_gettime( CLOCK_REALTIME, &start);
+		AXPY (&m, alpha, x, &inc_x, y, &inc_y );
 
-    	AXPY (&m, alpha, x, &inc_x, y, &inc_y );
+		clock_gettime( CLOCK_REALTIME, &stop);
+		fp = fopen(FILER,"w");
+		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
+			fprintf(fp, FORMAT, y[i]);
+		}
+		fclose(fp);
 
-    	clock_gettime( CLOCK_REALTIME, &stop);
+		time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_nsec - start.tv_nsec)) * 1.e-9;
 
-    	time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_nsec - start.tv_nsec)) * 1.e-9;
+		timeg += time1;
+	}
+	else
+	{
+		fp = fopen(FILEX,"r");
+		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
+			fscanf(fp, "%f\n", &x[i]);
+		}
+		fclose(fp);
 
-	timeg += time1;
+		fp = fopen(FILEY,"r");
+		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
+			fscanf(fp, "%f\n", &x[i]);
+		}
+		fclose(fp);
+		clock_gettime( CLOCK_REALTIME, &start);
 
+		AXPY (&m, alpha, x, &inc_x, y, &inc_y );
+
+		clock_gettime( CLOCK_REALTIME, &stop);
+		fp = fopen(FILER,"w");
+		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
+			fprintf(fp, FORMAT, y[i]);
+		}
+		fclose(fp);
+
+		time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_nsec - start.tv_nsec)) * 1.e-9;
+
+		timeg += time1;
+	}
     }
 
     timeg /= loops;
