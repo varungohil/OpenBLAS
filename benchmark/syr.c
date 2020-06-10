@@ -200,7 +200,7 @@ int main(int argc, char *argv[]){
 	{
 		fp = fopen(FILEX,"r");
 		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
-			fscanf(fpa, "%f\n", &x[i]);
+			fscanf(fp, "%f\n", &x[i]);
 		}
 		fclose(fp);
 		
