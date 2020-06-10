@@ -168,6 +168,7 @@ int main(int argc, char *argv[]){
 #endif
 
   fprintf(stderr, "   SIZE       Flops\n");
+  FILE *fp;
 
   for(m = from; m <= to; m += step)
   {
