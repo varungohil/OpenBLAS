@@ -35,11 +35,6 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #undef SYR2
 
-#define FILEA   "check_syr2_a.txt"
-#define FILEX   "check_ssyr2_x.txt"
-#define FILEY   "check_ssyr2_y.txt"
-#define FILER   "check_ssyr2_res.txt"
-#define FORMAT  "%.14f\n"
 
 #ifdef DOUBLE
 #define SYR2   BLASFUNC(dsyr2)
