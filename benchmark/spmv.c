@@ -44,12 +44,14 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FILEX   "dspmv_x.txt"
 #define FILEY   "dspmv_y.txt"
 #define FILER   "dspmv_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define SPMV   BLASFUNC(sspmv)
 #define FILEA   "sspmv_a.txt"
 #define FILEX   "sspmv_x.txt"
 #define FILEY   "sspmv_y.txt"
 #define FILER   "sspmv_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 
 #else
@@ -60,12 +62,14 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FILEX   "zspmv_x.txt"
 #define FILEY   "zspmv_y.txt"
 #define FILER   "zspmv_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define SPMV   BLASFUNC(cspmv)
 #define FILEA   "cspmv_a.txt"
 #define FILEX   "cspmv_x.txt"
 #define FILEY   "cspmv_y.txt"
 #define FILER   "cspmv_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 
 #endif
