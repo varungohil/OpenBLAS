@@ -195,7 +195,7 @@ int main(int argc, char *argv[])
             fp = fopen(FILEA,"r");
             for(j = 0; j < n; j++) {
                 for(i = 0; i < n * COMPSIZE; i++) {
-                    fscanf(fp, "%f\n", &a[(long)i + (long)j * (long)m * COMPSIZE]);
+                    fscanf(fp, "%f\n", &a[(long)i + (long)j * (long)n * COMPSIZE]);
                 }
             }
             fclose(fp);
