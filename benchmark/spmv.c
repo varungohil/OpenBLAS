@@ -256,13 +256,13 @@ int main(int argc, char *argv[]){
 	    {
                 fp = fopen(FILEX,"r");
 		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
-			        fscanf(fp, "%f\n", &c[i]);
+			        fscanf(fp, "%f\n", &x[i]);
 		}
 		fclose(fp);
                 
 		fp = fopen(FILEY,"r");
 		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
-			        fscanf(fp, "%f\n", &c[i]);
+			        fscanf(fp, "%f\n", &y[i]);
 		}
 		fclose(fp);
 		gettimeofday( &start, (struct timezone *)0);
