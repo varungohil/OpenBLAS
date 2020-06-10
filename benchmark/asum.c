@@ -40,6 +40,7 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ASUM   BLASFUNC(dzasum)
 #define FILEX   "dzasum_x.txt"
 #define FILER   "dzasum_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define ASUM   BLASFUNC(scasum)
 #define FILEX   "scasum_x.txt"
