@@ -51,18 +51,42 @@ double fabs(double);
 #ifndef COMPLEX
 #ifdef XDOUBLE
 #define GESV   BLASFUNC(qgesv)
+#define FILEA   "qgesv_a.txt"
+#define FILEB   "qgesv_b.txt"
+#define FILER   "qgesv_res.txt"
+#define FORMAT  "%lf\n"
 #elif defined(DOUBLE)
 #define GESV   BLASFUNC(dgesv)
+#define FILEA   "dgesv_a.txt"
+#define FILEB   "dgesv_b.txt"
+#define FILER   "dgesv_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define GESV   BLASFUNC(sgesv)
+#define FILEA   "sgesv_a.txt"
+#define FILEB   "sgesv_b.txt"
+#define FILER   "sgesv_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 #else
 #ifdef XDOUBLE
 #define GESV   BLASFUNC(xgesv)
+#define FILEA   "xgesv_a.txt"
+#define FILEB   "xgesv_b.txt"
+#define FILER   "xgesv_res.txt"
+#define FORMAT  "%lf\n"
 #elif defined(DOUBLE)
 #define GESV   BLASFUNC(zgesv)
+#define FILEA   "zgesv_a.txt"
+#define FILEB   "zgesv_b.txt"
+#define FILER   "zgesv_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define GESV   BLASFUNC(cgesv)
+#define FILEA   "cgesv_a.txt"
+#define FILEB   "cgesv_b.txt"
+#define FILER   "cgesv_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 #endif
 
@@ -141,12 +165,13 @@ int main(int argc, char *argv[]){
   int from =   1;
   int to   = 200;
   int step =   1;
-
+  int random_input = 0; //Varun added
+	
   struct timeval start, stop;
   double time1;
 
   argc--;argv++;
-
+  if (argc > 0) { random_input = atol(*argv);    argc--; argv++; }
   if (argc > 0) { from     = atol(*argv);		argc--; argv++;}
   if (argc > 0) { to       = MAX(atol(*argv), from);	argc--; argv++;}
   if (argc > 0) { step     = atol(*argv);		argc--; argv++;}
@@ -170,23 +195,49 @@ int main(int argc, char *argv[]){
 #endif
 
   fprintf(stderr, "   SIZE       Flops              Time\n");
-
+  FILE *fp;
   for(m = from; m <= to; m += step){
 
     fprintf(stderr, " %dx%d : ", (int)m, (int)m);
-
-    for(j = 0; j < m; j++){
-      for(i = 0; i < m * COMPSIZE; i++){
-	a[(long)i + (long)j * (long)m * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-      }
+     
+    if(random_input)
+    {
+	    fp = fopen(FILEA,"w");
+	    for(j = 0; j < m; j++){
+	      for(i = 0; i < m * COMPSIZE; i++){
+		a[(long)i + (long)j * (long)m * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+		fprintf(fp, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
+	      }
+	    }
+	    fclose(fp);
+            
+            fp = fopen(FILEB,"w");
+	    for(j = 0; j < m; j++){
+	      for(i = 0; i < m * COMPSIZE; i++){
+		b[(long)i + (long)j * (long)m * COMPSIZE] = 0.0;
+		fprintf(fp, FORMAT, b[(long)i + (long)j * (long)m * COMPSIZE]);
+	      }
+	    }
+	    fclose(fp);
     }
-
-    for(j = 0; j < m; j++){
-      for(i = 0; i < m * COMPSIZE; i++){
-	b[(long)i + (long)j * (long)m * COMPSIZE] = 0.0;
-      }
+    else
+    {
+	    fp = fopen(FILEA,"r");
+	    for(j = 0; j < m; j++){
+	      for(i = 0; i < m * COMPSIZE; i++){
+		      fscanf(fp, "%f\n", &a[(long)i + (long)j * (long)m * COMPSIZE]);
+	      }
+	    }
+	    fclose(fp);
+            
+            fp = fopen(FILEB,"r");
+	    for(j = 0; j < m; j++){
+	      for(i = 0; i < m * COMPSIZE; i++){
+		      fscanf(fp, "%f\n", &b[(long)i + (long)j * (long)m * COMPSIZE]);
+	      }
+	    }
+	    fclose(fp);
     }
-
 
     for (j = 0; j < m; ++j) {
       for (i = 0; i < m * COMPSIZE; ++i) {
@@ -200,7 +251,13 @@ int main(int argc, char *argv[]){
 
     gettimeofday( &stop, (struct timezone *)0);
 
-
+    fp = fopen(FILER,"w");
+    for(j = 0; j < m; j++){
+      for(i = 0; i < m * COMPSIZE; i++){
+	      fprintf(fp, FORMAT, b[(long)i + (long)j * (long)m * COMPSIZE]);
+      }
+    }
+    fclose(fp);
     time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
 
 
