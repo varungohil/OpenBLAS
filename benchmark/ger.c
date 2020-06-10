@@ -38,14 +38,34 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef COMPLEX
 #ifdef DOUBLE
 #define GER   BLASFUNC(zgeru)
+#define FILEA   "zgeru_a.txt"
+#define FILEX   "zgeru_x.txt"
+#define FILEY   "zgeru_y.txt"
+#define FILER   "zgeru_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define GER   BLASFUNC(cgeru)
+#define FILEA   "cgeru_a.txt"
+#define FILEX   "cgeru_x.txt"
+#define FILEY   "cgeru_y.txt"
+#define FILER   "cgeru_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 #else
 #ifdef DOUBLE
 #define GER   BLASFUNC(dger)
+#define FILEA   "dger_a.txt"
+#define FILEX   "dger_x.txt"
+#define FILEY   "dger_y.txt"
+#define FILER   "dger_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define GER   BLASFUNC(sger)
+#define FILEA   "sger_a.txt"
+#define FILEX   "sger_x.txt"
+#define FILEY   "sger_y.txt"
+#define FILER   "sger_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 #endif
 
@@ -130,12 +150,13 @@ int main(int argc, char *argv[]){
   int from =   1;
   int to   = 200;
   int step =   1;
+  int random_input = 0; //Varun added
 
   struct timeval start, stop;
   double time1,timeg;
 
   argc--;argv++;
-
+  if (argc > 0) { random_input = atol(*argv);    argc--; argv++; }
   if (argc > 0) { from     = atol(*argv);		argc--; argv++;}
   if (argc > 0) { to       = MAX(atol(*argv), from);	argc--; argv++;}
   if (argc > 0) { step     = atol(*argv);		argc--; argv++;}
@@ -170,7 +191,7 @@ int main(int argc, char *argv[]){
 #endif
 
   fprintf(stderr, "   SIZE       Flops\n");
-
+  FILE *fp; //Varun added
   for(m = from; m <= to; m += step)
   {
 
@@ -179,36 +200,97 @@ int main(int argc, char *argv[]){
    if ( has_param_n == 0 ) n = m;
 
    fprintf(stderr, " %6dx%d : ", (int)m,(int)n);
+   if(random_input)
+   {
+	   fp = fopen(FILEA,"w");
+	   for(j = 0; j < m; j++){
+			for(i = 0; i < n * COMPSIZE; i++){
+				a[(long)i + (long)j * (long)m * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+				fprintf(fp, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
+			}
+	   }
+	   fclose(fp);
+	   
+	   fp = fopen(FILEX,"w");
+	   for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
+				x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+		   fprintf(fp, FORMAT, x[i]);
+	   }
+	   fclose(fp);
+	   
+	   fp = fopen(FILEY,"w");
+	   for(i = 0; i < n * COMPSIZE * abs(inc_y); i++){
+				y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+		   fprintf(fp, FORMAT, y[i]);
+	   }
+	   fclose(fp);
 
-   for(j = 0; j < m; j++){
-      		for(i = 0; i < n * COMPSIZE; i++){
-			a[(long)i + (long)j * (long)m * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-      		}
+	    for (l=0; l<loops; l++)
+	    {
+
+		gettimeofday( &start, (struct timezone *)0);
+
+		GER (&m, &n, alpha, x, &inc_x, y, &inc_y, a , &m);
+
+		gettimeofday( &stop, (struct timezone *)0);
+
+		time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
+
+		timeg += time1;
+
+	    }
+	   fp = fopen(FILER,"w");
+	   for(j = 0; j < m; j++){
+			for(i = 0; i < n * COMPSIZE; i++){
+				fprintf(fp, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
+			}
+	   }
+	   fclose(fp);
    }
+   else
+   {
+	   fp = fopen(FILEA,"r");
+	   for(j = 0; j < m; j++){
+			for(i = 0; i < n * COMPSIZE; i++){
+				fscanf(fp, "%f\n", &a[(long)j + (long)i * (long)m * COMPSIZE]);
+			}
+	   }
+	   fclose(fp);
+	   
+	   fp = fopen(FILEX,"r");
+	   for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
+		   fscanf(fp, "%f\n", &x[i]);
+	   }
+	   fclose(fp);
+	   
+	   fp = fopen(FILEY,"r");
+	   for(i = 0; i < n * COMPSIZE * abs(inc_y); i++){
+		   fscanf(fp, "%f\n", &y[i]);
+	   }
+	   fclose(fp);
 
+	    for (l=0; l<loops; l++)
+	    {
 
-   for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
-			x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
+		gettimeofday( &start, (struct timezone *)0);
+
+		GER (&m, &n, alpha, x, &inc_x, y, &inc_y, a , &m);
+
+		gettimeofday( &stop, (struct timezone *)0);
+
+		time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
+
+		timeg += time1;
+
+	    }
+	   fp = fopen(FILER,"w");
+	   for(j = 0; j < m; j++){
+			for(i = 0; i < n * COMPSIZE; i++){
+				fprintf(fp, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
+			}
+	   }
+	   fclose(fp);
    }
-
-   for(i = 0; i < n * COMPSIZE * abs(inc_y); i++){
-			y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-   }
-
-    for (l=0; l<loops; l++)
-    {
-
-    	gettimeofday( &start, (struct timezone *)0);
-
-    	GER (&m, &n, alpha, x, &inc_x, y, &inc_y, a , &m);
-
-    	gettimeofday( &stop, (struct timezone *)0);
-
-    	time1 = (double)(stop.tv_sec - start.tv_sec) + (double)((stop.tv_usec - start.tv_usec)) * 1.e-6;
-
-	timeg += time1;
-
-    }
 
     timeg /= loops;
 
