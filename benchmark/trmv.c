@@ -41,13 +41,13 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FILEA   "dtrmv_a.txt"
 #define FILEX   "dtrmv_x.txt"
 #define FILER   "dtrmv_res.txt"
-#define FORMAT  "%lf\n
+#define FORMAT  "%lf\n"
 #else
 #define TRMV   BLASFUNC(strmv)
 #define FILEA   "strmv_a.txt"
 #define FILEX   "strmv_x.txt"
 #define FILER   "strmv_res.txt"
-#define FORMAT  "%.14f\n
+#define FORMAT  "%.14f\n"
 #endif
 
 #else
@@ -57,13 +57,13 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FILEA   "ztrmv_a.txt"
 #define FILEX   "ztrmv_x.txt"
 #define FILER   "ztrmv_res.txt"
-#define FORMAT  "%.14f\n
+#define FORMAT  "%.14f\n"
 #else
 #define TRMV   BLASFUNC(ctrmv)
 #define FILEA   "ctrmv_a.txt"
 #define FILEX   "ctrmv_x.txt"
 #define FILER   "ctrmv_res.txt"
-#define FORMAT  "%.14f\n
+#define FORMAT  "%.14f\n"
 #endif
 
 #endif
