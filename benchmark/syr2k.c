@@ -57,8 +57,18 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef DOUBLE
 #define SYR2K   BLASFUNC(zsyr2k)
+#define FILEA   "zsyr2k_a.txt"
+#define FILEB   "zsyr2k_b.txt"
+#define FILEC   "zsyr2k_c.txt"
+#define FILER   "zsyr2k_res.txt"
+#define FORMAT  "%lf\n"
 #else
 #define SYR2K   BLASFUNC(csyr2k)
+#define FILEA   "csyr2k_a.txt"
+#define FILEB   "csyr2k_b.txt"
+#define FILEC   "csyr2k_c.txt"
+#define FILER   "csyr2k_res.txt"
+#define FORMAT  "%.14f\n"
 #endif
 
 #endif
