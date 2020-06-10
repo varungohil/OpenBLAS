@@ -164,7 +164,7 @@ int main(int argc, char *argv[])
             for(j = 0; j < n; j++) {
                 for(i = 0; i < n * COMPSIZE; i++) {
                     a[(long)i + (long)j * (long)n * COMPSIZE] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-                    fprintf(fp, FORMAT, a[(long)j + (long)i * (long)n * COMPSIZE]);
+                    fprintf(fp, FORMAT,a[(long)i + (long)j * (long)n * COMPSIZE]);
                 }
             }
             fclose(fp);
@@ -194,7 +194,7 @@ int main(int argc, char *argv[])
             fp = fopen(FILEA,"r");
             for(j = 0; j < n; j++) {
                 for(i = 0; i < n * COMPSIZE; i++) {
-                    fscanf(fp, "%f\n", &a[(long)j + (long)i * (long)n * COMPSIZE]);
+                    fscanf(fp, "%f\n", &a[(long)i + (long)j * (long)n * COMPSIZE]);
                 }
             }
             fclose(fp);
