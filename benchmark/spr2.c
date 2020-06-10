@@ -197,7 +197,7 @@ int main(int argc, char *argv[]){
 		fp = fopen(FILEC,"w");
 		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
 			c[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-			fprintf(fp, FORMAT, b[i]);
+			fprintf(fp, FORMAT, c[i]);
 		}
 		fclose(fp);
 
