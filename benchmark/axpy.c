@@ -224,7 +224,7 @@ int main(int argc, char *argv[]){
 
 		fp = fopen(FILEY,"r");
 		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
-			fscanf(fp, "%f\n", &x[i]);
+			fscanf(fp, "%f\n", &y[i]);
 		}
 		fclose(fp);
 		clock_gettime( CLOCK_REALTIME, &start);
