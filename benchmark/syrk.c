@@ -219,8 +219,8 @@ int main(int argc, char *argv[]){
     }
     else
     {
-	    fpa = fopen(FILEA,"w");
-	    fpc = fopen(FILEC,"w");
+	    fpa = fopen(FILEA,"r");
+	    fpc = fopen(FILEC,"r");
 	    for(j = 0; j < m; j++){
 	      for(i = 0; i < m * COMPSIZE; i++){
 		fscanf(fpa, "%f\n", &a[(long)i + (long)j * (long)m * COMPSIZE]);
