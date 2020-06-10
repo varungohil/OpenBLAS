@@ -204,7 +204,7 @@ int main(int argc, char *argv[]){
 		    fp = fopen(FILER,"w");
 		    for(j = 0; j < m; j++){
 		      for(i = 0; i < m * COMPSIZE; i++){
-			fprintf(fpa, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
+			fprintf(fp, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
 		      }
 		    }
 		    fclose(fp);
