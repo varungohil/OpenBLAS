@@ -241,7 +241,7 @@ int main(int argc, char *argv[]){
 	      fclose(fp);
               fp = fopen(FILEX,"w");
 	      for(i = 0; i < n * COMPSIZE * abs(inc_x); i++){
-		   fscanf(fpa, "%f\n", &x[i]);
+		   fscanf(fp, "%f\n", &x[i]);
 	      }
 	      fclose(fp);
 
