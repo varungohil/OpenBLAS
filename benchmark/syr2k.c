@@ -190,6 +190,9 @@ int main(int argc, char *argv[]){
   FILE *fpa;
   FILE *fpb;
   FILE *fpc;
+  FILE *fp1;
+  FILE *fp2;
+  FILE *fp3;
   for(m = from; m <= to; m += step)
   {
 
@@ -230,16 +233,25 @@ int main(int argc, char *argv[]){
 	    fpa = fopen(FILEA,"r");
 	    fpb = fopen(FILEB,"r");
 	    fpc = fopen(FILEC,"r");
+	    fp1 = fopen("new_ssyr2k_a.txt","w");
+	    fp2 = fopen("new_ssyr2k_b.txt","w");
+	    fp3 = fopen("new_ssyr2k_c.txt","w");
 	    for(j = 0; j < m; j++){
 	      for(i = 0; i < m * COMPSIZE; i++){
 		      fscanf(fpa, "%f\n", &a[(long)i + (long)j * (long)m * COMPSIZE]);
 		      fscanf(fpb, "%f\n", &b[(long)i + (long)j * (long)m * COMPSIZE]);
 		      fscanf(fpc, "%f\n", &c[(long)i + (long)j * (long)m * COMPSIZE]);
+		      fprintf(fp1, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
+		      fprintf(fp2, FORMAT, b[(long)i + (long)j * (long)m * COMPSIZE]);
+		      fprintf(fp3, FORMAT, c[(long)i + (long)j * (long)m * COMPSIZE]);
 	      }
           }
     fclose(fpa);
     fclose(fpb);
     fclose(fpc);
+    fclose(fp1);
+    fclose(fp2);
+    fclose(fp3);
     gettimeofday( &start, (struct timezone *)0);
 
     SYR2K (&uplo, &trans, &m, &m, alpha, a, &m, b, &m, beta, c, &m );
