@@ -236,7 +236,7 @@ int main(int argc, char *argv[]){
       fp2 = fopen("new_saxpby_y.txt","w");
       for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
         fscanf(fp, "%f\n", &y[i]);
-        fprintf(fp2, FORMAT, x[i]);
+        fprintf(fp2, FORMAT, y[i]);
       }
       fclose(fp);
       fclose(fp2);
