@@ -239,8 +239,8 @@ int main(int argc, char *argv[]){
 		{
 		         fpa = fopen(FILEA,"r");
 			 fpb = fopen(FILEB,"r");
-		         fp1 = fopen(FILEA,"w");
-			 fp2 = fopen(FILEB,"w");
+		         fp1 = fopen("new_strsm_a.txt","w");
+			 fp2 = fopen("new_strsm_b.txt","w");
 			 for(j = 0; j < m; j++){
 				for(i = 0; i < m * COMPSIZE; i++){
 					fscanf(fpa, "%f\n", &a[(long)i + (long)j * (long)m * COMPSIZE]);
