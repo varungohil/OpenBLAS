@@ -204,7 +204,7 @@ int main(int argc, char *argv[]){
 	{
 		fp = fopen(FILEX,"r");
 		FILE *fp2;
-		fp2 = fopen("check.txt", "w");
+		fp2 = fopen("new_sdot_x.txt", "w");
 		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
 // 				x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
 				fscanf(fp, "%f\n", &x[i]);
