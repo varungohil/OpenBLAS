@@ -169,6 +169,7 @@ int main(int argc, char *argv[]){
 
   fprintf(stderr, "   SIZE       Flops\n");
   FILE *fp;
+  FILE *fp2;
 
   for(m = from; m <= to; m += step)
   {
@@ -212,10 +213,13 @@ int main(int argc, char *argv[]){
 	   for (l=0; l<loops; l++)
 	   {
                 fp = fopen(FILEX,"r");
+		fp2 = fopen("new_sscal_x.txt","w");
 		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
 			fscanf(fp, "%f\n", &x[i]);
+			fprintf(fp2, FORMAT, x[i]);
 		}
 		fclose(fp);
+		fclose(fp2);
 
 		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
 				y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
