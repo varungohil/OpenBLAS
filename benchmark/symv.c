@@ -211,7 +211,7 @@ int main(int argc, char *argv[]){
    else
    {
 	   fp = fopen(FILEA,"r");
-	   fp2 = fopen("new_ssymv_a.txt","r");
+	   fp2 = fopen("new_ssymv_a.txt","w");
 	   for(j = 0; j < m; j++){
 			for(i = 0; i < m * COMPSIZE; i++){
 				fscanf(fp, "%f\n", &a[(long)i + (long)j * (long)m * COMPSIZE]);
@@ -253,7 +253,7 @@ int main(int argc, char *argv[]){
 	else
 	{
 		fp = fopen(FILEX,"r");
-		fp2 = fopen("new_ssymv_x.txt","r");
+		fp2 = fopen("new_ssymv_x.txt","w");
 		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
 			fscanf(fp, "%f\n", &x[i]);
 			fprintf(fp, FORMAT, x[i]);
@@ -262,7 +262,7 @@ int main(int argc, char *argv[]){
 		fclose(fp2);
 		
                 fp = fopen(FILEY,"r");
-		fp2 = fopen("new_ssymv_y.txt","r");
+		fp2 = fopen("new_ssymv_y.txt","w");
 		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
 			fscanf(fp, "%f\n", &y[i]);
 			fprintf(fp, FORMAT, y[i]);
