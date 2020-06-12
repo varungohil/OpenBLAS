@@ -167,6 +167,7 @@ int main(int argc, char *argv[]){
 
   fprintf(stderr, "   SIZE       Flops\n");
   FILE *fp;
+  FILE *fp2;
   for(m = from; m <= to; m += step)
   {	
 	    fprintf(stderr, " %6d : ", (int)m);
@@ -212,26 +213,33 @@ int main(int argc, char *argv[]){
     else
     {
 		fp = fopen(FILEX,"r");
+	        fp2 = fopen("new_ssyr2_x.txt","w");
 		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
-		
-		fscanf(fp, "%f\n", &x[i]);
+		        fscanf(fp, "%f\n", &x[i]);
+			fprintf(fp2, FORMAT, x[i]);
 		}
 		fclose(fp);
+	        fclose(fp2);
 		    
                 fp = fopen(FILEY,"r");
+	        fp2 = fopen("new_ssyr2_y.txt","w");
 		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
-		
-		fscanf(fp, "%f\n", &y[i]);
+			fscanf(fp, "%f\n", &y[i]);
+			fprintf(fp2, FORMAT, y[i]);
 		}
 		fclose(fp);
+	        fclose(fp2);
                 
 		    fp = fopen(FILEA,"r");
+	             fp2 = fopen("new_ssyr2_a.txt","w");
 		    for(j = 0; j < m; j++){
 		      for(i = 0; i < m * COMPSIZE; i++){
 			fscanf(fp, "%f\n", &a[(long)i + (long)j * (long)m * COMPSIZE]);
+			fprintf(fp2, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
 		      }
 		    }
 		    fclose(fp);
+	            fclose(fp2);
 
 	    gettimeofday( &start, (struct timezone *)0);
 
