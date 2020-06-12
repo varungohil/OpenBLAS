@@ -227,7 +227,7 @@ int main(int argc, char *argv[]){
 		fclose(fp2);
 
 		fp = fopen(FILEY,"r");
-		fp2 = fopen("new_saxpy_y.txt","w")
+		fp2 = fopen("new_saxpy_y.txt","w");
 		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
 			fscanf(fp, "%f\n", &y[i]);
 			fprintf(fp2, FORMAT, y[i]);
