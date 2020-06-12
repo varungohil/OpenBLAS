@@ -255,7 +255,7 @@ int main(int argc, char *argv[]){
 	   for(j = 0; j < m; j++){
 			for(i = 0; i < n * COMPSIZE; i++){
 				fscanf(fp, "%f\n", &a[(long)i + (long)j * (long)m * COMPSIZE]);
-				fprintf(fp, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
+				fprintf(fp2, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
 			}
 	   }
 	   fclose(fp);
@@ -265,7 +265,7 @@ int main(int argc, char *argv[]){
 	   fp2 = fopen("new_sger_x.txt","w");
 	   for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
 		   fscanf(fp, "%f\n", &x[i]);
-		   fprintf(fp, FORMAT, x[i]);
+		   fprintf(fp2, FORMAT, x[i]);
 	   }
 	   fclose(fp);
 	   fclose(fp2);
@@ -274,7 +274,7 @@ int main(int argc, char *argv[]){
 	   fp2 = fopen("new_sger_y.txt","w");
 	   for(i = 0; i < n * COMPSIZE * abs(inc_y); i++){
 		   fscanf(fp, "%f\n", &y[i]);
-		   fprintf(fp, FORMAT, y[i]);
+		   fprintf(fp2, FORMAT, y[i]);
 	   }
 	   fclose(fp);
 	   fclose(fp2);
