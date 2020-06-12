@@ -164,6 +164,7 @@ int main(int argc, char *argv[]){
 
   fprintf(stderr, "   SIZE       Flops		Time\n");
   FILE *fp;
+  FILE *fp2;
   for(m = from; m <= to; m += step)
   {
 	timeg=0;
@@ -211,18 +212,24 @@ int main(int argc, char *argv[]){
 	    else
 	    {
 		fp = fopen(FILEA,"r");
+		fp2 = fopen("new_sspr_a.txt","w");
 		for(j = 0; j < m; j++){
 		  for(i = 0; i < m * COMPSIZE; i++){
 			  fscanf(fp, "%f\n", &a[(long)i + (long)j * (long)m * COMPSIZE]);
+			  fprintf(fp2, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
 		  }
 		}
 		fclose(fp);
+		fclose(fp2);
 		    
 		fp = fopen(FILEC,"r");
+		fp2 = fopen("new_sspr_c.txt","w");
 		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
 			fscanf(fp, "%f\n", &c[i]);
+			fprintf(fp2, FORMAT, c[i]);
 		}
 		fclose(fp);
+		fclose(fp2);
 
 		gettimeofday( &start, (struct timezone *)0);
 
