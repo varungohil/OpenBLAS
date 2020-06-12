@@ -231,13 +231,13 @@ int main(int argc, char *argv[]){
 		fp = fopen(FILEX,"w");
 		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
 				x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-			fprintf(fp, FORMAT, x[i]);
+			fprintf(fp2, FORMAT, x[i]);
 		}
 		fclose(fp);
                 fp = fopen(FILEY,"w");
 		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
 				y[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
-			fprintf(fp, FORMAT, y[i]);
+			fprintf(fp2, FORMAT, y[i]);
 		}
 		fclose(fp);
 		gettimeofday( &start, (struct timezone *)0);
