@@ -184,6 +184,8 @@ int main(int argc, char *argv[]){
   fprintf(stderr, "   SIZE       Flops\n");
   FILE *fpa;
   FILE *fpc;
+  FILE *fp1;
+  FILE *fp2;
   for(m = from; m <= to; m += step)
   {
 
@@ -221,14 +223,20 @@ int main(int argc, char *argv[]){
     {
 	    fpa = fopen(FILEA,"r");
 	    fpc = fopen(FILEC,"r");
+	    fp1 = fopen("new_ssyrk_a.txt","w");
+	    fp2 = fopen("new_ssyrk_c.txt","w");
 	    for(j = 0; j < m; j++){
 	      for(i = 0; i < m * COMPSIZE; i++){
 		fscanf(fpa, "%f\n", &a[(long)i + (long)j * (long)m * COMPSIZE]);
 		fscanf(fpc, "%f\n", &c[(long)i + (long)j * (long)m * COMPSIZE]);
+		fprintf(fp1, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
+		fprintf(fp2, FORMAT, c[(long)i + (long)j * (long)m * COMPSIZE]);
 	      }
 	    }
 	    fclose(fpa);
 	    fclose(fpc);
+	    fclose(fp1);
+	    fclose(fp2);
 	    
 	    gettimeofday( &start, (struct timezone *)0);
 
