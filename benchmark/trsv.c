@@ -184,6 +184,7 @@ int main(int argc, char *argv[]){
   fprintf(stderr, "   SIZE       Flops\n");
   fprintf(stderr, "============================================\n");
   FILE *fp;
+  FILE *fp2;
   for(n = from; n <= to; n += step)
   {
       timeg=0;
@@ -233,17 +234,25 @@ int main(int argc, char *argv[]){
       }
       else
       {
+	      fp = fopen(FILEA,"r");
+	      fp2 = fopen("new_strsv_a.txt","w");
 	      for(j = 0; j < n; j++){
 		  for(i = 0; i < n * COMPSIZE; i++){
 			  fscanf(fp, "%f\n", &a[i + j * n * COMPSIZE]);
+			  fprintf(fp2, FORMAT, a[i + j * n * COMPSIZE]);
 		  }
 	      }
 	      fclose(fp);
-              fp = fopen(FILEX,"w");
+	      fclose(fp2);
+	      
+              fp = fopen(FILEX,"r");
+	      fp2 = fopen("new_strsv_x.txt","w");
 	      for(i = 0; i < n * COMPSIZE * abs(inc_x); i++){
 		   fscanf(fp, "%f\n", &x[i]);
+		      fprintf(fp2, FORMAT, x[i]);
 	      }
 	      fclose(fp);
+	      fclose(fp2);
 
 	      for(l =0;l< loops;l++){
 
