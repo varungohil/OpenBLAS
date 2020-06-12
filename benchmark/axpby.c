@@ -222,17 +222,24 @@ int main(int argc, char *argv[]){
     }
     else
     {
+      FILE *fp2;
       fp = fopen(FILEX,"r");
+      fp2 = fopen("new_saxpby_x","r");
       for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
               fscanf(fp, "%f\n", &x[i]);
+        fprintf(fp2, FORMAT, x[i]);
       }
       fclose(fp);
+      fclose(fp2);
       
       fp = fopen(FILEY,"r");
+      fp2 = fopen("new_saxpby_y","r");
       for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
         fscanf(fp, "%f\n", &y[i]);
+        fprintf(fp2, FORMAT, x[i]);
       }
       fclose(fp);
+      fclose(fp2);
 
       for (l=0; l<loops; l++)
       {
