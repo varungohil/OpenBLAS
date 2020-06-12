@@ -229,14 +229,23 @@ int main(int argc, char *argv[]){
     }
     else
     {
+	    FILE *fp1;
+	    FILE *fp2;
+	    FILE *fp3;
 	    fpa = fopen(FILEA,"r");
 	    fpb = fopen(FILEB,"r");
 	    fpc = fopen(FILEC,"r");
+	    fp1 = fopen("new_ssymm_a.txt","w");
+	    fp2 = fopen("new_ssymm_b.txt","w");
+	    fp3 = fopen("new_ssymm_c.txt","w");
 	    for(j = 0; j < m; j++){
 	      for(i = 0; i < m * COMPSIZE; i++){
 		fscanf(fpa, "%f\n", &a[(long)i + (long)j * (long)m * COMPSIZE]);
 		fscanf(fpb, "%f\n", &b[(long)i + (long)j * (long)m * COMPSIZE]);
 		fscanf(fpc, "%f\n", &c[(long)i + (long)j * (long)m * COMPSIZE]);
+		fprintf(fp1, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
+		fprintf(fp2, FORMAT, b[(long)i + (long)j * (long)m * COMPSIZE]);
+		fprintf(fp3, FORMAT, c[(long)i + (long)j * (long)m * COMPSIZE]);
 	      }
 	    }
 	    fclose(fpa);
