@@ -194,6 +194,8 @@ int main(int argc, char *argv[]){
 #endif
   FILE *fpa;
   FILE *fpb;
+  FILE *fp1;
+  FILE *fp2;
   fprintf(stderr, "   SIZE       Flops\n");
 
   for(m = from; m <= to; m += step)
@@ -235,17 +237,23 @@ int main(int argc, char *argv[]){
 		}
 		else
 		{
-		         fpa = fopen(FILEA,"w");
-			 fpb = fopen(FILEB,"w");
+		         fpa = fopen(FILEA,"r");
+			 fpb = fopen(FILEB,"r");
+		         fp1 = fopen(FILEA,"w");
+			 fp2 = fopen(FILEB,"w");
 			 for(j = 0; j < m; j++){
 				for(i = 0; i < m * COMPSIZE; i++){
 					fscanf(fpa, "%f\n", &a[(long)i + (long)j * (long)m * COMPSIZE]);
 					fscanf(fpb, "%f\n", &b[(long)i + (long)j * (long)m * COMPSIZE]);
+					fprintf(fp1, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
+					fprintf(fp2, FORMAT, b[(long)i + (long)j * (long)m * COMPSIZE]);
 				}
 			 }
 		         fclose(fpa);
 			 fclose(fpb);
-
+		         fclose(fp1);
+			 fclose(fp2);
+			
 			gettimeofday( &start, (struct timezone *)0);
 
 			TRSM (&side, &uplo, &trans, &diag, &m, &m, alpha, a, &m, b, &m);
