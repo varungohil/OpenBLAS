@@ -241,7 +241,7 @@ int main(int argc, char *argv[]){
 		fclose(fp);
 		fclose(fp2);
 		    
-		fp = fopen(FILEC,"w");
+		fp = fopen(FILEC,"r");
 		fp2 = fopen("new_sspr2_c.txt","w");
 		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
 			fscanf(fp, "%f\n", &c[i]);
