@@ -264,7 +264,7 @@ int main(int argc, char *argv[]){
 			if ( has_param_n == 0 ) n = m;
 			fprintf(stderr, " %6dx%d : ", (int)m,(int)n);
 			fp = fopen(FILEA,"r");
-			fp2 = fopen("new_sgemv_a","w");
+			fp2 = fopen("new_sgemv_a.txt","w");
 			for(j = 0; j < m; j++){
 				for(i = 0; i < n * COMPSIZE; i++){
 					fscanf(fp, "%f\n", &a[(long)j + (long)i * (long)m * COMPSIZE]);
@@ -277,7 +277,7 @@ int main(int argc, char *argv[]){
 			for (l=0; l<loops; l++)
 			{
                                 fp = fopen(FILEX,"r");
-				fp2 = fopen("new_sgemv_x","w");
+				fp2 = fopen("new_sgemv_x.txt","w");
 				for(i = 0; i < n * COMPSIZE * abs(inc_x); i++){
 					fscanf(fp, "%f\n", &x[i]);
 					fprintf(fp2, FORMAT, x[i]);
@@ -285,7 +285,7 @@ int main(int argc, char *argv[]){
 				fclose(fp);
 				fclose(fp2);
                                 fp = fopen(FILEY,"r");
-				fp2 = fopen("new_sgemv_y","w");
+				fp2 = fopen("new_sgemv_y.txt","w");
 				for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
 					fscanf(fp, "%f\n", &y[i]);
 					fprintf(fp2, FORMAT, y[i]);
@@ -366,7 +366,7 @@ int main(int argc, char *argv[]){
 			if ( has_param_n == 0 ) n = m;
 			fprintf(stderr, " %6dx%d : ", (int)m,(int)n);
 			fp = fopen(FILEA,"r");
-			fp2 = fopen("new_sgemv_a","w");
+			fp2 = fopen("new_sgemv_a.txt","w");
 			for(j = 0; j < m; j++){
 				for(i = 0; i < n * COMPSIZE; i++){
 					fscanf(fp, "%f\n", &a[(long)j + (long)i * (long)m * COMPSIZE]);
@@ -379,7 +379,7 @@ int main(int argc, char *argv[]){
 			for (l=0; l<loops; l++)
 			{
                                 fp = fopen(FILEX,"r");
-				fp2 = fopen("new_sgemv_x","w");
+				fp2 = fopen("new_sgemv_x.txt","w");
 				for(i = 0; i < n * COMPSIZE * abs(inc_x); i++){
 					fscanf(fp, "%f\n", &x[i]);
 					fprintf(fp2, FORMAT, x[i]);
@@ -387,7 +387,7 @@ int main(int argc, char *argv[]){
 				fclose(fp);
 				fclose(fp2);
                                 fp = fopen(FILEY,"r");
-				fp2 = fopen("new_sgemv_y","w");
+				fp2 = fopen("new_sgemv_y.txt","w");
 				for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
 					fscanf(fp, "%f\n", &y[i]);
 					fprintf(fp2, FORMAT, y[i]);
