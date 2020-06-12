@@ -204,7 +204,7 @@ int main(int argc, char *argv[]){
 	{
 		fp = fopen(FILEX,"r");
 		FILE *fp2;
-		fp2 = open("check.txt");
+		fp2 = fopen("check.txt");
 		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
 // 				x[i] = ((FLOAT) rand() / (FLOAT) RAND_MAX) - 0.5;
 				fscanf(fp, "%f\n", &x[i]);
