@@ -182,6 +182,7 @@ int main(int argc, char *argv[]){
    fprintf(stderr, " %6d : ", (int)m);
 
    FILE *fp;
+   FILE *fp2;
    for (l=0; l<loops; l++)
    {
         if(random_input)
@@ -217,16 +218,23 @@ int main(int argc, char *argv[]){
 	else
 	{
 		fp = fopen(FILEX,"r");
+		fp2 = fopen("new_saxpy_x.txt","w");
 		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
 			fscanf(fp, "%f\n", &x[i]);
+			fprintf(fp2, FORMAT, x[i]);
 		}
 		fclose(fp);
+		fclose(fp2);
 
 		fp = fopen(FILEY,"r");
+		fp2 = fopen("new_saxpy_y.txt","w")
 		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
 			fscanf(fp, "%f\n", &y[i]);
+			fprintf(fp2, FORMAT, y[i]);
 		}
 		fclose(fp);
+		fclose(fp2);
+		
 		clock_gettime( CLOCK_REALTIME, &start);
 
 		AXPY (&m, alpha, x, &inc_x, y, &inc_y );
