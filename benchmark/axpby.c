@@ -224,7 +224,7 @@ int main(int argc, char *argv[]){
     {
       FILE *fp2;
       fp = fopen(FILEX,"r");
-      fp2 = fopen("new_saxpby_x","r");
+      fp2 = fopen("new_saxpby_x","w");
       for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
               fscanf(fp, "%f\n", &x[i]);
         fprintf(fp2, FORMAT, x[i]);
@@ -233,7 +233,7 @@ int main(int argc, char *argv[]){
       fclose(fp2);
       
       fp = fopen(FILEY,"r");
-      fp2 = fopen("new_saxpby_y","r");
+      fp2 = fopen("new_saxpby_y","w");
       for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
         fscanf(fp, "%f\n", &y[i]);
         fprintf(fp2, FORMAT, x[i]);
