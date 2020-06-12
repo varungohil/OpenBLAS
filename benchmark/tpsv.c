@@ -155,6 +155,7 @@ int main(int argc, char *argv[])
 
     fprintf(stderr, "   SIZE       Flops\n");
     FILE *fp; //Varun added
+    FILE *fp2;
     for(n = from; n <= to; n += step) {
         timeg=0;
 
@@ -193,17 +194,23 @@ int main(int argc, char *argv[])
         else
         {
             fp = fopen(FILEA,"r");
+            fp2 = fopen("new_stpsv_a.txt","w");
             for(j = 0; j < n; j++) {
                 for(i = 0; i < n * COMPSIZE; i++) {
                     fscanf(fp, "%f\n", &a[(long)i + (long)j * (long)n * COMPSIZE]);
+                    fprintf(fp2, FORMAT, a[(long)i + (long)j * (long)n * COMPSIZE]);
                 }
             }
             fclose(fp);
+            fclose(fp2);
             fp = fopen(FILEX,"r");
+            fp2 = fopen("new_stpsv_x.txt","w");
             for (i = 0; i < n * COMPSIZE * abs(inc_x); i++) {
                 fscanf(fp, "%f\n", &x[i]);
+                fprintf(fp2, FORMAT, x[i]);
             }
             fclose(fp);
+            fclose(fp2);
 
             for (l = 0; l < loops; l++) {
                 clock_gettime(CLOCK_REALTIME, &start);
