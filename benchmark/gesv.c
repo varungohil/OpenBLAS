@@ -196,6 +196,7 @@ int main(int argc, char *argv[]){
 
   fprintf(stderr, "   SIZE       Flops              Time\n");
   FILE *fp;
+  FILE *fp2;
   for(m = from; m <= to; m += step){
 
     fprintf(stderr, " %dx%d : ", (int)m, (int)m);
@@ -223,20 +224,26 @@ int main(int argc, char *argv[]){
     else
     {
 	    fp = fopen(FILEA,"r");
+	    fp2 = fopen("new_sgesv_a.txt","w");
 	    for(j = 0; j < m; j++){
 	      for(i = 0; i < m * COMPSIZE; i++){
 		      fscanf(fp, "%f\n", &a[(long)i + (long)j * (long)m * COMPSIZE]);
+		      fprintf(fp2, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
 	      }
 	    }
 	    fclose(fp);
+	    fclose(fp2);
             
             fp = fopen(FILEB,"r");
+	    fp2 = fopen("new_sgesv_b.txt","w");
 	    for(j = 0; j < m; j++){
 	      for(i = 0; i < m * COMPSIZE; i++){
 		      fscanf(fp, "%f\n", &b[(long)i + (long)j * (long)m * COMPSIZE]);
+		      fprintf(fp2, FORMAT, b[(long)i + (long)j * (long)m * COMPSIZE]);
 	      }
 	    }
 	    fclose(fp);
+	    fclose(fp2);
     }
 
     for (j = 0; j < m; ++j) {
