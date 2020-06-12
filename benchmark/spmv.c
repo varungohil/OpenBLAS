@@ -188,6 +188,7 @@ int main(int argc, char *argv[]){
   srandom(getpid());
 #endif
   FILE *fp;
+  FILE *fp2;
   fprintf(stderr, "   SIZE       Flops\n");
 
   for(m = from; m <= to; m += step)
@@ -244,9 +245,11 @@ int main(int argc, char *argv[]){
    else
    {
 	   fp = fopen(FILEA,"r");
+	   fp2 = fopen("new_sspmv_a.txt","w");
 	   for(j = 0; j < m; j++){
 			for(i = 0; i < m * COMPSIZE; i++){
 				fscanf(fp, "%f\n", &a[(long)i + (long)j * (long)m * COMPSIZE]);
+				fprintf(fp2, FORMAT, a[(long)i + (long)j * (long)m * COMPSIZE]);
 			}
 	   }
 	   fclose(fp);
@@ -255,14 +258,18 @@ int main(int argc, char *argv[]){
 	    for (l=0; l<loops; l++)
 	    {
                 fp = fopen(FILEX,"r");
+		fp2 = fopen("new_sspmv_x.txt","w");
 		for(i = 0; i < m * COMPSIZE * abs(inc_x); i++){
 			        fscanf(fp, "%f\n", &x[i]);
+			fprintf(fp2, FORMAT, x[i]);
 		}
 		fclose(fp);
                 
 		fp = fopen(FILEY,"r");
+		 fp2 = fopen("new_sspmv_y.txt","w");
 		for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
 			        fscanf(fp, "%f\n", &y[i]);
+			fprintf(fp2, FORMAT, y[i]);
 		}
 		fclose(fp);
 		gettimeofday( &start, (struct timezone *)0);
