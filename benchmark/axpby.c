@@ -250,7 +250,7 @@ int main(int argc, char *argv[]){
           fp = fopen(FILER,"w");
           for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
                   fprintf(fp, FORMAT, y[i]);
-                  printf("%.14f", y[i]);
+                  printf("%.14f\n", y[i]);
           }
           fclose(fp);
 
