@@ -244,13 +244,20 @@ int main(int argc, char *argv[]){
       for (l=0; l<loops; l++)
       {
           gettimeofday( &start, (struct timezone *)0);
-
+        
+          fp = fopen("int_saxpby_y.txt","w");
+          for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
+                  fprintf(fp, FORMAT, y[i]);
+//                   printf("%.14f\n", y[i]);
+          }
+          fclose(fp);
+        
           AXPBY (&m, alpha, x, &inc_x, beta, y, &inc_y );
         
           fp = fopen(FILER,"w");
           for(i = 0; i < m * COMPSIZE * abs(inc_y); i++){
                   fprintf(fp, FORMAT, y[i]);
-                  printf("%.14f\n", y[i]);
+//                   printf("%.14f\n", y[i]);
           }
           fclose(fp);
 
