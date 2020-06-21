@@ -221,6 +221,7 @@ int main(int argc, char *argv[]){
 		gettimeofday( &start, (struct timezone *)0);
 
 		result = DOT (&m, x, &inc_x, y, &inc_y );
+		printf("%.14f", result);
 		fp = fopen(FILER,"w");
 		fprintf(fp, FORMAT, result);
 		fclose(fp);
