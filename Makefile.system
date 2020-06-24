@@ -1261,7 +1261,7 @@ FCOMMON_OPT += -g
 endif
 
 ifndef COMMON_OPT
-COMMON_OPT = -O2 -mno-avx512f
+COMMON_OPT = -O2 -mno-avx512f -mno-avx
 endif
 
 ifndef FCOMMON_OPT
