@@ -1261,11 +1261,11 @@ FCOMMON_OPT += -g
 endif
 
 ifndef COMMON_OPT
-COMMON_OPT = -O0
+COMMON_OPT = -O2 -mno-avx512f
 endif
 
 ifndef FCOMMON_OPT
-FCOMMON_OPT = -O0 -frecursive
+FCOMMON_OPT = -O2 -frecursive -mno-avx512f
 endif
 
 override CFLAGS     += $(COMMON_OPT) $(CCOMMON_OPT) -I$(TOPDIR)
