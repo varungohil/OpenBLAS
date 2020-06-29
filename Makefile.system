@@ -151,7 +151,7 @@ endif
 # On x86_64 build getarch with march=native unless the compiler is PGI. This is required to detect AVX512 support in getarch.
 ifeq ($(HOSTARCH), x86_64)
 ifeq ($(findstring pgcc,$(HOSTCC)),)
-GETARCH_FLAGS += -march=westmere
+GETARCH_FLAGS += -march=native
 endif
 endif
 
@@ -1261,11 +1261,11 @@ FCOMMON_OPT += -g
 endif
 
 ifndef COMMON_OPT
-COMMON_OPT = -O2 -mno-avx512f -mno-avx
+COMMON_OPT = -O2
 endif
 
 ifndef FCOMMON_OPT
-FCOMMON_OPT = -O2 -frecursive -mno-avx512f -mno-avx
+FCOMMON_OPT = -O2
 endif
 
 override CFLAGS     += $(COMMON_OPT) $(CCOMMON_OPT) -I$(TOPDIR)
