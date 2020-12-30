@@ -1,3 +1,14 @@
+# OpenBLAS Fork
+This is a fork of OpenBLAS repo. 
+
+For research purposes, I have modified some of the OpenBLAS benchmarks to read their inputs from a file rather than generating them randomly. Further the modified programs will write their results to a file.
+
+To enable this, I have added a new command line argument (random_input) using which one can state if the pogram has to read inputs from a file or generate them randomly. 
+If random_input is 0, then program reads inputs from a file, otherwise it generates inputs randomly. Example usage: ./sgemm.goto 0 200 1000 2
+
+The program reads the inputs from files named <program\_name>\_<operand\_name>. For example, the sgemm program will read its input matrices a, b and c from files sgemm\_a.txt, sgemm\_b.txt, sgemm\_c.txt respectively. Further, the result will be stored in  file <program\_name>\_res.txt, which would be sgemm_res.txt for sgemm workload.
+
+
 # OpenBLAS
 
 [![Join the chat at https://gitter.im/xianyi/OpenBLAS](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/xianyi/OpenBLAS?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
